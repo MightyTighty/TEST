@@ -11,6 +11,16 @@ export default function Login() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
   
+    const [tokan, setToken] = useState("")
+    useEffect(() => {
+        const tok=localStorage.getItem("token");
+        console.log(tok);
+        if(tok!=undefined && tok!=""){
+          router.push("/demo");
+        }
+      }, []);
+
+
     const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
@@ -31,13 +41,13 @@ export default function Login() {
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        console.log(response);
+       
         const data = await response.json();
   
         console.log(data);
-        if (data.success) {
-          // Handle successful login (e.g., redirect, save token, etc.)
-          console.log('Login successful:', data);
+        if(data.access!=""){
+          localStorage.setItem("token",data.access);
+          router.push("/demo");
         } else {
           // Handle login failure
           setError(data.message || 'Login failed');

@@ -1,8 +1,23 @@
 import LanguageDropdown from "@/components/elements/LanguageDropdown"
 import Link from "next/link"
 import Sidebar from "../Sidebar"
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
+    const router = useRouter();
+    const [tokan, setToken] = useState("")
+    useEffect(() => {
+        const tok=localStorage.getItem("token");
+        setToken(tok);
+      }, []);
+
+const signout=()=>{
+
+    localStorage.setItem("token","");
+    router.push('/login');
+}
+
     return (
         <>
             <header>
@@ -21,6 +36,7 @@ export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
                                                
                                                 <li><Link href="/">Home</Link></li>
                                                 <li><Link href="/contact">contacts</Link></li>
+                                                <li><Link href="/#howitwork">How It Works</Link></li>
                                                 <li><Link href="/#Pricing">Pricing</Link></li>
                                             </ul>
                                         </div>
@@ -30,8 +46,11 @@ export default function Header1({ scroll, isMobileMenu, handleMobileMenu }) {
                                                 <li className="header-lang">
                                                     <LanguageDropdown />
                                                 </li>
-                                              
-                                                <li className="header-btn"><Link href="/login" className="btn">sign in</Link></li>
+                                              {
+                                                (tokan=="" || tokan==undefined)?<li className="header-btn"><Link href="/login" className="btn">sign in</Link></li>:
+                                                <li className="header-btn"><button onClick={() => signout()} className="btn">sign out</button></li>
+                                              }
+                                                
                                             </ul>
                                         </div>
                                     </nav>

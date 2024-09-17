@@ -624,7 +624,7 @@ label {
     flex-direction: row;
     flex-wrap     : wrap;
     padding       : 0 0;
-    margin        : 0 auto;
+    margin        : 0 8%;
 }
 
 .navbar-wrap ul li {
@@ -7122,4 +7122,28 @@ padding: 20px 7px;
   }
 .wafeformmainclass{
     display: flex;
+    height: 104px;
 }
+
+.single-thumb .range-slider__thumb[data-lower] {
+    width: 0;
+  }
+  .single-thumb .range-slider__range {
+    border-radius: 6px;
+  }
+  #myTabContent{
+    width: 50%;
+    padding-top: 5%;;
+  }
+  .realspan{
+    background: green;
+    color:white;
+    padding: 2px 5px;
+    border-radius: 5px;
+  }
+  .fakespan{
+    background: red;
+    color:white;
+    padding: 2px 5px;
+    border-radius: 5px;
+  }

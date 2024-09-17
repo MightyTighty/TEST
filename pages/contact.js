@@ -1,5 +1,53 @@
 import Layout from "@/components/layout/Layout"
+import { useState, useRef, useEffect } from 'react'
+
+import { useRouter } from 'next/navigation';
+
 export default function Contact() {
+    const router = useRouter();
+    const [fullName, setFullName] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+    const [message, setMessage] = useState('');
+    
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [success, setSuccess] = useState(null);
+
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+    
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+    
+        const postData = { fullName, email,phone,message };
+    
+        try {
+         
+          const response = await fetch('http://localhost:8000/apicontactus/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+              },
+            body: JSON.stringify(postData),
+          });
+    
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+    
+          const result = await response.json();
+          console.log(result);
+          setSuccess('Submitted successfully!');
+         
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
 
     return (
         <>
@@ -65,18 +113,30 @@ export default function Contact() {
                                             </div>
                                             <div className="col-lg-7">
                                                 <div className="contact-form">
-                                                    <form action="#">
+                                                    <form  onSubmit={handleSubmit}>
                                                         <div className="form-grp">
-                                                            <input type="text" id="name" placeholder="Your Name" required />
+                                                            <input type="text" id="name" placeholder="Your Name"
+                                                            value={fullName}
+                                                            onChange={(e) => setFullName(e.target.value)}
+                                                            required />
                                                         </div>
                                                         <div className="form-grp">
-                                                            <input type="email" id="email" placeholder="Your email*" required />
+                                                            <input type="email" id="email" placeholder="Your email*"
+                                                            value={email}
+                                                            onChange={(e) => setEmail(e.target.value)}
+                                                            required />
                                                         </div>
                                                         <div className="form-grp">
-                                                            <input type="text" id="phone" placeholder="Phone" required />
+                                                            <input type="text" id="phone" placeholder="Phone"
+                                                            value={phone}
+                                                            onChange={(e) => setPhone(e.target.value)}
+                                                            required />
                                                         </div>
                                                         <div className="form-grp">
-                                                            <textarea name="message" id="message" placeholder="Please describe what you need*" />
+                                                            <textarea name="message" id="message"
+                                                            value={message}
+                                                            onChange={(e) => setMessage(e.target.value)}
+                                                            placeholder="Please describe what you need*" />
                                                         </div>
                                                         <button className="btn" type="submit">submit here</button>
                                                     </form>

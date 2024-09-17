@@ -24,8 +24,8 @@ export default function Banner1() {
                                 <h2 className="title d-none wow fadeInUp" data-wow-delay=".2s">Whatever You want to ask- DEX.AI has the <span>Answers,</span> <span>Solutions</span></h2>
                                 <p className="wow fadeInUp" data-wow-delay=".4s">Artificial intelligence makes it fast  easy to create content for your blog, social media, website, and more! Rated 5/5 stars in 3,000+ reviews.</p>
                                 <div className="banner-btn">
-                                    <Link href="/login" className="gradient-btn wow fadeInLeft" data-wow-delay=".6s">start a free trial</Link>
-                                    <Link href="/#howitwork" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">how dex.ai work</Link>
+                                    <Link href="/demo" className="gradient-btn wow fadeInLeft" data-wow-delay=".6s">start a free trial</Link>
+                                    <Link href="/work" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">how it works</Link>
                                 </div>
                             </div>
                         </div>

@@ -13,10 +13,22 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [phone, setPhone] = useState('');
     const [country, setCountry] = useState('');
-  
+    const [howDidYouFindUs, sethowDidYouFindUs] = useState('');
+    
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+
+
+    const [tokan, setToken] = useState("")
+    useEffect(() => {
+        const tok=localStorage.getItem("token");
+        console.log(tok);
+        if(tok!=undefined && tok!=""){
+          router.push("/demo");
+        }
+      }, []);
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -25,7 +37,7 @@ export default function Login() {
         setError(null);
         setSuccess(null);
     
-        const postData = { first_name, last_name,phone,country,email,password };
+        const postData = { first_name, last_name,phone,country,email,password,howDidYouFindUs };
     
         try {
          
@@ -107,6 +119,13 @@ export default function Login() {
                                             <input type="password" id="password"
                                              value={password}
                                              onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="form-grp pb-20">
+                                            <label htmlFor="word">How did you find us</label>
+                                            <input type="password" id="HowDidYouFindUs"
+                                             value={howDidYouFindUs}
+                                             onChange={(e) => sethowDidYouFindUs(e.target.value)}
                                             />
                                         </div>
                                       

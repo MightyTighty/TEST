@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
 import { FaPlay, FaPause } from 'react-icons/fa';
 
-const Waveform = ({ audioUrl, waveColor, progressColor, size, filename }) => {
+const Waveform = ({ audioUrl, waveColor, progressColor, size, filename,IsReal,forHome,onPlay,audioId }) => {
   const waveformRef = useRef(null);
   const wavesurferRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,33 +34,46 @@ const Waveform = ({ audioUrl, waveColor, progressColor, size, filename }) => {
     if (wavesurferRef.current) {
       if (isPlaying) {
         wavesurferRef.current.pause();
+        setIsPlaying(false);
       } else {
         wavesurferRef.current.play();
+        setIsPlaying(true);
+        if (onPlay) onPlay(); // Notify parent component
       }
-      setIsPlaying(!isPlaying);
     }
   };
-
   return (
     <div className='wafeformmainclass'>
         <button 
         onClick={togglePlayPause} 
+        data-id={audioId}
         style={{ display: 'flex', alignItems: 'center', marginTop: '0px 10px', border: 'none', background: 'none' }}
       >
         <img 
-          src={isPlaying ? "/assets/img/voice/pauseicon.png" : "/assets/img/voice/playicon.png"} 
+          src={isPlaying ? (IsReal?"/assets/img/voice/RealPauseIcon.png":"/assets/img/voice/FakePauseIcon.png") : (IsReal?"/assets/img/voice/RealPlayIcon.png":"/assets/img/voice/FakePlayIcon.png")} 
           alt={isPlaying ? "Pause" : "Play"} 
           style={{ width: '50px', height: 'auto' }}
         />
       </button>
-      <div ref={waveformRef} style={{ width: '100%', height: size.height || '80px' }}></div>
+      <div style={{ width: '80%', height: size.height || '80px' }}>
+                  <p>{filename}</p>                               
+                  <div ref={waveformRef}></div>
+      </div>
+     
       <button 
         onClick={togglePlayPause} 
         style={{ display: 'flex', alignItems: 'center', marginTop: '0px 10px', border: 'none', background: 'none' }}
       >
+
+<img 
+         src={forHome ?"" : "/assets/img/voice/reportIcon.png"}  
+          style={{ width: '30px', height: 'auto',margin:'10px 10px' }}
+        />
+
+          <span className={IsReal? "realspan" : "fakespan"}>{!forHome?(IsReal?"Real":"Fake"):""}</span>
         <img 
-          src="/assets/img/voice/deleteicon.png"
-          style={{ width: '40px', height: 'auto' }}
+         src={forHome ?"" : "/assets/img/voice/deleteicon.png"}  
+          style={{ width: '30px', height: 'auto',margin:'10px 10px' }}
         />
       </button>
     </div>
