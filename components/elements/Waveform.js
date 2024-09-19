@@ -55,14 +55,14 @@ const Waveform = ({ audioUrl, waveColor, progressColor, size, filename,IsReal,fo
           style={{ width: '50px', height: 'auto' }}
         />
       </button>
-      <div style={{ width: '80%', height: size.height || '80px' }}>
-                  <p>{filename}</p>                               
+      <div style={{ width:forHome?'100%':'80%', height: size.height || '80px' }}>
+                 {forHome?"":<p>{filename}</p> }                               
                   <div ref={waveformRef}></div>
       </div>
      
-      <button 
+      <div 
         onClick={togglePlayPause} 
-        style={{ display: 'flex', alignItems: 'center', marginTop: '0px 10px', border: 'none', background: 'none' }}
+        style={{ display: forHome?'none':'flex', alignItems: 'center', marginTop: '0px 10px', border: 'none', background: 'none' }}
       >
 
 <img 
@@ -75,7 +75,7 @@ const Waveform = ({ audioUrl, waveColor, progressColor, size, filename,IsReal,fo
          src={forHome ?"" : "/assets/img/voice/deleteicon.png"}  
           style={{ width: '30px', height: 'auto',margin:'10px 10px' }}
         />
-      </button>
+      </div>
     </div>
   );
 };

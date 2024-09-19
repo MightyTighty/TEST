@@ -10,31 +10,31 @@ import { useRouter } from 'next/navigation';
 
 const audioFiles = [
     {
-        id:1,
+        id: 1,
         url: '/assets/audio/sampleaudio.mp3',
         waveColor: '#FFFFFF',
         progressColor: 'red',
         size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
         filename: 'audio1.mp3',
-        isReal:false
+        isReal: false
     },
-    {  
-        id:2,
+    {
+        id: 2,
         url: '/assets/audio/sampleaudio.mp3',
         waveColor: '#FFFFFF',
         progressColor: 'green',
         size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
         filename: 'audio2.mp3',
-        isReal:true
+        isReal: true
     },
     {
-        id:3,
+        id: 3,
         url: '/assets/audio/sampleaudio.mp3',
         waveColor: '#FFFFFF',
         progressColor: 'red',
         size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 2 },
         filename: 'audio3.mp3',
-        isReal:false
+        isReal: false
     },
 ];
 
@@ -47,30 +47,50 @@ export default function Job() {
     const [currentPlaying, setCurrentPlaying] = useState(null);
 
     const [tokan, setToken] = useState("")
-    useEffect(() => {
-        const tok=localStorage.getItem("token");
-        console.log(tok);
-        if(tok==undefined || tok==""){
-          router.push("/login");
+    const [file, setFile] = useState(null);
+    const [preview, setPreview] = useState("assets/img/voice/upload.png");
+
+
+
+    const handleFileChange = (event) => {
+
+        const tok = localStorage.getItem("token");
+       
+        if (tok == undefined || tok == "") {
+            router.push("/login");
         }
-      }, []);
+
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            // Create a preview URL
+            const objectUrl = URL.createObjectURL(selectedFile);
+            setPreview(objectUrl);
+        }
+    };
+
+   
+
+
 
     const handleOnClick = (index) => {
         setActiveIndex(index)
     }
 
-    const handleChange=(checked) =>{
+    const handleChange = (checked) => {
         setIsChecked(!checked);
-      }
+    }
 
-     
+    const openFileInput = () => {
+        $("#fileinput").click();
+    }
 
-      const handlePlay = (id) => {
+    const handlePlay = (id) => {
         if (currentPlaying && currentPlaying !== id) {
-          document.querySelector(`button[data-id="${currentPlaying}"]`).click();
+            document.querySelector(`button[data-id="${currentPlaying}"]`).click();
         }
         setCurrentPlaying(id);
-      };
+    };
 
     return (
         <>
@@ -86,38 +106,62 @@ export default function Job() {
                                 <div className="col-lg-3">
                                     <div className="responds-wrap uploadarea">
                                         <div className="icon">
-                                            <img id="uploadicon" src="assets/img/voice/upload.png" alt="" />
+
+
+                                            <input
+                                                type="file"
+                                                onChange={handleFileChange}
+                                                accept="image/*" // Only allow image files
+                                                style={{ display: 'none' }} // Hide the default input
+                                                id="file-upload"
+                                            />
+                                            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
+                                                {preview ? (
+                                                    <img
+                                                        src={preview}
+                                                        alt="Image Preview"
+                                                        style={{ width: '120px', height: 'auto', marginBottom: '10px' }}
+                                                    />
+                                                ) : (
+                                                    <div style={{ width: '120px', height: '120px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <span>Upload Image</span>
+                                                    </div>
+                                                )}
+                                            </label>
+
+
+
                                         </div>
                                         <div className="content pb-40">
                                             <a >Upload File</a>
-                                          
+
                                         </div>
                                         <div className="content pb-40">
                                             <p>Frame Length 2</p>
-                                        <RangeSlider
-                                             className="single-thumb"
-                                             defaultValue={[0, 50]}
-                                             thumbsDisabled={[true, false]}
-                                             rangeSlideDisabled={true}
-                                           />
+                                            <RangeSlider
+                                                className="single-thumb"
+                                                defaultValue={[0, 50]}
+                                                thumbsDisabled={[true, false]}
+                                                rangeSlideDisabled={true}
+                                            />
                                         </div>
 
                                         <div className="content pb-40">
-                                        <p>Sensitivity 50%</p>
-                                        <RangeSlider
-                                             className="single-thumb"
-                                             defaultValue={[0, 50]}
-                                             thumbsDisabled={[true, false]}
-                                             rangeSlideDisabled={true}
-                                           />
+                                            <p>Sensitivity 50%</p>
+                                            <RangeSlider
+                                                className="single-thumb"
+                                                defaultValue={[0, 50]}
+                                                thumbsDisabled={[true, false]}
+                                                rangeSlideDisabled={true}
+                                            />
                                         </div>
 
                                         <div className="content pb-40">
-                                        <p>Isolate Voice</p>
-                                        <label>
-      
-        <Switch onChange={() => handleChange(IsChecked)} checked={IsChecked} />
-      </label>
+                                            <p>Isolate Voice</p>
+                                            <label>
+
+                                                <Switch onChange={() => handleChange(IsChecked)} checked={IsChecked} />
+                                            </label>
                                         </div>
 
                                         <div className="content">
@@ -125,7 +169,7 @@ export default function Job() {
                                                 <Link href="/login" className="btn btn-two">Upload</Link>
                                             </div>
                                         </div>
-                                    
+
                                     </div>
 
                                 </div>
@@ -134,7 +178,7 @@ export default function Job() {
                                         <div className="job-item-wrap">
                                             {files.map((audio, index) => (
                                                 <div className="job-item" key={index}>
-                                                 
+
                                                     <Waveform
                                                         key={audio.id}
                                                         audioUrl={audio.url}
@@ -156,7 +200,7 @@ export default function Job() {
                         </div>
                     </section>
 
-                  
+
                     {/* help-area-end */}
                 </div>
             </Layout>

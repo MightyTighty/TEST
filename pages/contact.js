@@ -39,8 +39,11 @@ export default function Contact() {
           }
     
           const result = await response.json();
-          console.log(result);
-          setSuccess('Submitted successfully!');
+          setFullName('');
+          setEmail('');
+          setPhone('');
+          setMessage('');
+          setSuccess('Thanks! Submitted successfully! we will contact you soon.');
          
         } catch (error) {
           setError(error.message);
@@ -114,6 +117,7 @@ export default function Contact() {
                                             <div className="col-lg-7">
                                                 <div className="contact-form">
                                                     <form  onSubmit={handleSubmit}>
+                                                        <p>{success}</p>
                                                         <div className="form-grp">
                                                             <input type="text" id="name" placeholder="Your Name"
                                                             value={fullName}
