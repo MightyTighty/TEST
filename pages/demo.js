@@ -137,6 +137,11 @@ export default function Job() {
         setCurrentPlaying(id);
     };
 
+    const handleDelete = (id) => {
+        // Filter out the file with the specified ID from the files list
+        setFiles(files.filter(file => file.id !== id));
+    };
+
     return (
         <>
             <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={<>Try a <span>Demo</span></>}>
@@ -224,6 +229,13 @@ export default function Job() {
                                                         onPlay={() => handlePlay(audio.id)}
                                                         audioId={audio.id}
                                                     />
+                                                    <button 
+                                                        onClick={() => handleDelete(audio.id)} 
+                                                        className="btn btn-danger btn-sm mt-2"
+                                                        style={{ display: 'block', margin: 'auto' }}
+                                                    >
+                                                        Remove
+                                                    </button>
                                                 </div>
                                             ))}
                                         </div>
