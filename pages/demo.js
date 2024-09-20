@@ -76,31 +76,64 @@ export default function Job() {
 
     const handleUpload = async () => {
         if (!file) return;
-
+    
         const formData = new FormData();
         formData.append('file', file);
-
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+    
+        let token = localStorage.getItem("token");
+    
+        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+    
+        if (response.status === 401) {
+            // Token might be expired, try refreshing it
+            const refresh = localStorage.getItem('refresh');
+            const refreshResponse = await fetch('http://127.0.0.1:8000/token/refresh/', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
-                body: formData
+                body: JSON.stringify({ refresh })
             });
-
-            if (response.ok) {
-                const result = await response.json();
-                setUploadResult(result);
+    
+            const refreshData = await refreshResponse.json();
+    
+            if (refreshData.access) {
+                localStorage.setItem('token', refreshData.access);
+                token = refreshData.access;
+    
+                // Retry the upload with the new token
+                const retryResponse = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+    
+                if (retryResponse.ok) {
+                    const result = await retryResponse.json();
+                    setUploadResult(result);
+                } else {
+                    console.error('Error uploading file after token refresh:', await retryResponse.json());
+                }
             } else {
-                const error = await response.json();
-                console.error('Error uploading file:', error);
+                console.error('Failed to refresh token:', refreshData);
+                // Redirect to login or handle token refresh failure
             }
-        } catch (error) {
-            console.error('Error uploading file:', error);
+        } else if (response.ok) {
+            const result = await response.json();
+            setUploadResult(result);
+        } else {
+            console.error('Error uploading file:', await response.json());
         }
     };
-
+    
 
    
 
