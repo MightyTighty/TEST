@@ -1,49 +1,17 @@
-
-import Layout from "@/components/layout/Layout"
-import Link from "next/link"
-import { useState, useRef, useEffect } from 'react'
-import Waveform from "@/components/elements/Waveform"
+import Layout from "@/components/layout/Layout";
+import Link from "next/link";
+import { useState, useEffect } from 'react';
+import Waveform from "@/components/elements/Waveform";
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Switch from "react-switch";
-import { useRouter } from 'next/navigation';
-
-
-const audioFiles = [
-    {
-        id: 1,
-        url: '/assets/audio/sampleaudio.mp3',
-        waveColor: '#FFFFFF',
-        progressColor: 'red',
-        size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
-        filename: 'audio1.mp3',
-        isReal: false
-    },
-    {
-        id: 2,
-        url: '/assets/audio/sampleaudio.mp3',
-        waveColor: '#FFFFFF',
-        progressColor: 'green',
-        size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
-        filename: 'audio2.mp3',
-        isReal: true
-    },
-    {
-        id: 3,
-        url: '/assets/audio/sampleaudio.mp3',
-        waveColor: '#FFFFFF',
-        progressColor: 'red',
-        size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 2 },
-        filename: 'audio3.mp3',
-        isReal: false
-    },
-];
+import { useRouter } from 'next/router';
 
 export default function Job() {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(1);
     const [isImageVisible, setImageVisible] = useState(true);
-    const [files, setFiles] = useState(audioFiles);
+    const [files, setFiles] = useState([]); // Initially empty, to be populated after upload
     const [isChecked, setIsChecked] = useState(true);
     const [currentPlaying, setCurrentPlaying] = useState(null);
 
@@ -51,8 +19,6 @@ export default function Job() {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("assets/img/voice/upload.png");
     const [uploadResult, setUploadResult] = useState(null);
-
-
 
     useEffect(() => {
         const tok = localStorage.getItem("token");
@@ -81,31 +47,76 @@ export default function Job() {
         const formData = new FormData();
         formData.append('file', file);
 
-        try {
-            const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+        let token = localStorage.getItem("token");
+
+        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (response.status === 401) {
+            // Token might be expired, try refreshing it
+            const refresh = localStorage.getItem('refresh');
+            const refreshResponse = await fetch('http://127.0.0.1:8000/token/refresh/', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
-                body: formData
+                body: JSON.stringify({ refresh })
             });
 
-            if (response.ok) {
-                const result = await response.json();
-                setUploadResult(result);
+            const refreshData = await refreshResponse.json();
+
+            if (refreshData.access) {
+                // Update token in localStorage
+                localStorage.setItem('token', refreshData.access);
+                token = refreshData.access;
+
+                // Retry the upload with the new token
+                const retryResponse = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (retryResponse.ok) {
+                    const result = await retryResponse.json();
+                    setUploadResult(result);
+                    updateFiles(result); // Update files with the response
+                } else {
+                    console.error('Error uploading file after token refresh:', await retryResponse.json());
+                }
             } else {
-                const error = await response.json();
-                console.error('Error uploading file:', error);
+                console.error('Failed to refresh token:', refreshData);
+                // Redirect to login or handle token refresh failure
             }
-        } catch (error) {
-            console.error('Error uploading file:', error);
+        } else if (response.ok) {
+            const result = await response.json();
+            setUploadResult(result);
+            updateFiles(result); // Update files with the response
+        } else {
+            console.error('Error uploading file:', await response.json());
         }
     };
 
-
-   
-
-
+    const updateFiles = (result) => {
+        // Add the uploaded file to the audio files list
+        const newFile = {
+            id: files.length + 1, // Incremental ID
+            url: preview, // Use the preview URL for the uploaded file
+            waveColor: '#FFFFFF',
+            progressColor: result.result === 'real' ? 'green' : 'red', // Green for real, red for fake
+            size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
+            filename: file.name,
+            isReal: result.result === 'real' // True for real, false for fake
+        };
+        setFiles([...files, newFile]); // Add the new file to the list
+    };
 
     const handleOnClick = (index) => {
         setActiveIndex(index);
