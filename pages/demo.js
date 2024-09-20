@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
-import { useState, useEffect, useRef } from 'react';
+import Link from "next/link";
+import { useState, useEffect } from 'react';
 import Waveform from "@/components/elements/Waveform";
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
@@ -13,36 +14,18 @@ export default function Job() {
     const [files, setFiles] = useState([]); // Initially empty, to be populated after upload
     const [isChecked, setIsChecked] = useState(true);
     const [currentPlaying, setCurrentPlaying] = useState(null);
-    const [recordingChunks, setRecordingChunks] = useState([]);
-    const [isRecording, setIsRecording] = useState(false);
 
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("assets/img/voice/upload.png");
     const [uploadResult, setUploadResult] = useState(null);
-
-    const sampleRate = 16000;  // Desired sample rate for audio processing
-    const recordingDurationMs = 2000;  // Duration for each audio chunk (2 seconds)
-    const numSamples = sampleRate * (recordingDurationMs / 1000);  // Number of samples per chunk
-    const audioContextRef = useRef(null);
-    const mediaRecorderRef = useRef(null);
-    const recordingTimeoutRef = useRef(null);
-    const chunkCounterRef = useRef(0);
+    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 }); // Store average result
 
     useEffect(() => {
         const tok = localStorage.getItem("token");
         if (tok) {
             setToken(tok);
         }
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            // Cleanup function
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-            }
-        };
     }, []);
 
     const handleFileChange = (event) => {
@@ -59,144 +42,134 @@ export default function Job() {
         }
     };
 
-    const startRecording = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            audioContextRef.current = new AudioContext({ sampleRate: sampleRate });
-            const source = audioContextRef.current.createMediaStreamSource(stream);
-            const processor = audioContextRef.current.createScriptProcessor(4096, 1, 1);
-
-            processor.onaudioprocess = (event) => {
-                const input = event.inputBuffer.getChannelData(0);
-                const buffer = new Float32Array(input.length);
-                buffer.set(input);
-                setRecordingChunks(prevChunks => [...prevChunks, buffer]);
-            };
-
-            source.connect(processor);
-            processor.connect(audioContextRef.current.destination);
-
-            mediaRecorderRef.current = new MediaRecorder(stream);
-            mediaRecorderRef.current.ondataavailable = async (event) => {
-                if (event.data.size > 0) {
-                    const arrayBuffer = await event.data.arrayBuffer();
-                    const float32Array = new Float32Array(arrayBuffer);
-                    setRecordingChunks(prevChunks => [...prevChunks, float32Array]);
-                }
-            };
-
-            mediaRecorderRef.current.onstop = async () => {
-                processRecordingChunks(recordingChunks);
-                setRecordingChunks([]);
-            };
-
-            setIsRecording(true);
-            const recordInterval = () => {
-                if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'inactive') {
-                    mediaRecorderRef.current.start();
-                }
-                recordingTimeoutRef.current = setTimeout(() => {
-                    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-                        mediaRecorderRef.current.stop();
-                        setTimeout(recordInterval, 0);
-                    }
-                }, recordingDurationMs);
-            };
-            recordInterval();
-        } catch (error) {
-            console.error('Error accessing microphone:', error);
-        }
-    };
-
-    const stopRecording = () => {
-        clearTimeout(recordingTimeoutRef.current);
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            mediaRecorderRef.current.stop();
-        }
-        setIsRecording(false);
-    };
-
-    const processRecordingChunks = (audioChunks) => {
-        const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
-        if (totalLength >= numSamples) {
-            const audioBuffer = mergeBuffers(audioChunks, numSamples);
-            uploadChunk(audioBuffer, `file-part${chunkCounterRef.current}`, true);
-            chunkCounterRef.current++;
-        } else {
-            console.warn(`Recorded length (${totalLength}) less than expected (${numSamples}).`);
-        }
-    };
-
-    const mergeBuffers = (bufferArray, length) => {
-        const result = new Float32Array(length);
-        let offset = 0;
-        bufferArray.forEach(buffer => {
-            if (offset + buffer.length <= length) {
-                result.set(buffer, offset);
-                offset += buffer.length;
-            } else {
-                result.set(buffer.subarray(0, length - offset), offset);
-                offset = length;
-            }
-        });
-        return result;
-    };
-
-    const uploadChunk = (chunk, fileName, isRecording) => {
-        const wavBuffer = encodeWAV(chunk, sampleRate, 1);
-        const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-        const audioFile = new File([wavBlob], `${fileName}.wav`, { type: 'audio/wav' });
+    // Function to upload chunks of the audio file
+    const uploadChunk = async (chunk, index) => {
         const formData = new FormData();
+        const audioFile = new File([chunk], `chunk-${index}.wav`, { type: 'audio/wav' });
         formData.append('file', audioFile);
 
-        fetch('http://127.0.0.1:8000/api/upload/', {
+        let token = localStorage.getItem("token");
+
+        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
             method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
             body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Server Response:', data);
-                // Additional logic for processing the response can be added here.
-            })
-            .catch(error => {
-                console.error('Error uploading file:', error);
-            });
+        });
+
+        return response.json();
+    };
+
+    // Function to handle file upload and chunking
+    const handleUpload = async () => {
+        if (!file) return;
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuffer = await file.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        const chunkDuration = 2; // 2 seconds
+        const chunkSize = chunkDuration * audioBuffer.sampleRate; // Number of samples in 2 seconds
+        const totalChunks = Math.ceil(audioBuffer.length / chunkSize);
+
+        let totalConfidence = 0;
+        let totalResults = 0;
+        let isRealCount = 0;
+
+        for (let i = 0; i < totalChunks; i++) {
+            const start = i * chunkSize;
+            const end = Math.min((i + 1) * chunkSize, audioBuffer.length);
+            const chunk = audioBuffer.getChannelData(0).slice(start, end);
+
+            const wavBuffer = encodeWAV(chunk, audioBuffer.sampleRate, 1);
+            const chunkBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+
+            const result = await uploadChunk(chunkBlob, i);
+            if (result) {
+                totalConfidence += result.confidence;
+                totalResults++;
+
+                if (result.result === 'real') isRealCount++;
+            }
+        }
+
+        // Calculate average result
+        const averageConfidence = totalConfidence / totalResults;
+        const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
+
+        setAverageResult({ result: majorityResult, confidence: averageConfidence });
     };
 
     const encodeWAV = (samples, sampleRate, numChannels) => {
         const buffer = new ArrayBuffer(44 + samples.length * 2);
         const view = new DataView(buffer);
 
+        const writeString = (view, offset, string) => {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        };
+
+        /* RIFF identifier */
         writeString(view, 0, 'RIFF');
+        /* file length */
         view.setUint32(4, 36 + samples.length * 2, true);
+        /* RIFF type */
         writeString(view, 8, 'WAVE');
+        /* format chunk identifier */
         writeString(view, 12, 'fmt ');
+        /* format chunk length */
         view.setUint32(16, 16, true);
+        /* sample format (raw) */
         view.setUint16(20, 1, true);
+        /* channel count */
         view.setUint16(22, numChannels, true);
+        /* sample rate */
         view.setUint32(24, sampleRate, true);
+        /* byte rate (sample rate * block align) */
         view.setUint32(28, sampleRate * numChannels * 2, true);
+        /* block align (channel count * bytes per sample) */
         view.setUint16(32, numChannels * 2, true);
+        /* bits per sample */
         view.setUint16(34, 16, true);
+        /* data chunk identifier */
         writeString(view, 36, 'data');
+        /* data chunk length */
         view.setUint32(40, samples.length * 2, true);
 
-        floatTo16BitPCM(view, 44, samples);
+        /* Write samples to data chunk */
+        let offset = 44;
+        for (let i = 0; i < samples.length; i++, offset += 2) {
+            const s = Math.max(-1, Math.min(1, samples[i]));
+            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        }
 
         return buffer;
     };
 
-    const writeString = (view, offset, string) => {
-        for (let i = 0; i < string.length; i++) {
-            view.setUint8(offset + i, string.charCodeAt(i));
-        }
+    const handleOnClick = (index) => {
+        setActiveIndex(index);
     };
 
-    const floatTo16BitPCM = (view, offset, input) => {
-        for (let i = 0; i < input.length; i++, offset += 2) {
-            const s = Math.max(-1, Math.min(1, input[i]));
-            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    const handleChange = (checked) => {
+        setIsChecked(!checked);
+    };
+
+    const openFileInput = () => {
+        document.getElementById('file-upload').click();
+    };
+
+    const handlePlay = (id) => {
+        if (currentPlaying && currentPlaying !== id) {
+            document.querySelector(`button[data-id="${currentPlaying}"]`).click();
         }
+        setCurrentPlaying(id);
+    };
+
+    const handleDelete = (id) => {
+        // Filter out the file with the specified ID from the files list
+        setFiles(files.filter(file => file.id !== id));
     };
 
     return (
@@ -268,6 +241,12 @@ export default function Job() {
                                                 <p>Confidence: {uploadResult.confidence}</p>
                                             </div>
                                         )}
+                                        {averageResult.result && (
+                                            <div className="content pb-40">
+                                                <p>Average Result: {averageResult.result}</p>
+                                                <p>Average Confidence: {averageResult.confidence.toFixed(2)}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="col-lg-9">
@@ -290,10 +269,6 @@ export default function Job() {
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
-                                    <div className="controls">
-                                        <button onClick={startRecording} disabled={isRecording} className="btn btn-primary">Start Recording</button>
-                                        <button onClick={stopRecording} disabled={!isRecording} className="btn btn-secondary">Stop Recording</button>
                                     </div>
                                 </div>
                             </div>
