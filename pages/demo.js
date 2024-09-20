@@ -18,6 +18,7 @@ export default function Job() {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("assets/img/voice/upload.png");
     const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 }); // Store average result
+    const [isFileUploaded, setIsFileUploaded] = useState(false); // To check if file is uploaded but not processed
 
     useEffect(() => {
         const tok = localStorage.getItem("token");
@@ -49,6 +50,7 @@ export default function Job() {
                 isReal: null // Set as null for now since we don't have the result
             };
             setFiles([newFile]); // Reset files list with the original file
+            setIsFileUploaded(true); // Indicate that a file has been uploaded but not processed
         }
     };
 
@@ -115,6 +117,7 @@ export default function Job() {
             file.id === 0 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
         );
         setFiles(updatedFiles);
+        setIsFileUploaded(false); // File has been processed, reset the upload indicator
     };
 
     const encodeWAV = (samples, sampleRate, numChannels) => {
@@ -283,6 +286,7 @@ export default function Job() {
                                                         handleDelete={handleDelete} // Pass the delete handler here
                                                         fakeImageUrl="/path/to/fake_image.png"
                                                         realImageUrl="/path/to/real_image.png"
+                                                        showIndicators={!isFileUploaded} // Hide indicators if file is not processed
                                                     />
                                                 </div>
                                             )}
