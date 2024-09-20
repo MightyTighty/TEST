@@ -228,19 +228,7 @@ export default function Job() {
                                                         IsReal={audio.isReal}
                                                         onPlay={() => handlePlay(audio.id)}
                                                         audioId={audio.id}
-                                                    />
-                                                    <img
-                                                        src="/assets/img/voice/deleteicon.png" // Delete icon path
-                                                        alt="Delete"
-                                                        onClick={() => handleDelete(audio.id)} // Delete handler
-                                                        className="delete-icon"
-                                                        style={{
-                                                            width: '24px',
-                                                            height: '24px',
-                                                            cursor: 'pointer',
-                                                            display: 'block',
-                                                            margin: '10px auto',
-                                                        }}
+                                                        handleDelete={handleDelete} // Pass the delete handler here
                                                     />
                                                 </div>
                                             ))}
