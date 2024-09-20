@@ -17,8 +17,7 @@ export default function Job() {
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("assets/img/voice/upload.png");
-    const [uploadResult, setUploadResult] = useState(null);
-    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 });
+    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 }); // Store average result
 
     useEffect(() => {
         const tok = localStorage.getItem("token");
@@ -38,10 +37,41 @@ export default function Job() {
             setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
             setPreview(objectUrl);
+
+            // Update files state to include the original file
+            const newFile = {
+                id: 0, // Use ID 0 for the original file
+                url: objectUrl,
+                waveColor: '#FFFFFF',
+                progressColor: '#FF9900',
+                size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
+                filename: selectedFile.name,
+                isReal: null // Set as null for now since we don't have the result
+            };
+            setFiles([newFile]); // Reset files list with the original file
         }
     };
 
-    // Upload chunks and calculate average confidence
+    // Function to upload chunks of the audio file
+    const uploadChunk = async (chunk, index) => {
+        const formData = new FormData();
+        const audioFile = new File([chunk], `chunk-${index}.wav`, { type: 'audio/wav' });
+        formData.append('file', audioFile);
+
+        let token = localStorage.getItem("token");
+
+        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        return response.json();
+    };
+
+    // Function to handle file upload and chunking
     const handleUpload = async () => {
         if (!file) return;
 
@@ -62,24 +92,10 @@ export default function Job() {
             const end = Math.min((i + 1) * chunkSize, audioBuffer.length);
             const chunk = audioBuffer.getChannelData(0).slice(start, end);
 
-            const wavBuffer = encodeWAV(chunk, 16000, 1); // Resample to 16000 Hz
+            const wavBuffer = encodeWAV(chunk, audioBuffer.sampleRate, 1);
             const chunkBlob = new Blob([wavBuffer], { type: 'audio/wav' });
 
-            const formData = new FormData();
-            const audioFile = new File([chunkBlob], `chunk-${i}.wav`, { type: 'audio/wav' });
-            formData.append('file', audioFile);
-
-            let token = localStorage.getItem("token");
-
-            const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            const result = await response.json();
+            const result = await uploadChunk(chunkBlob, i);
             if (result) {
                 totalConfidence += result.confidence;
                 totalResults++;
@@ -93,7 +109,12 @@ export default function Job() {
         const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
 
         setAverageResult({ result: majorityResult, confidence: averageConfidence });
-        updateFiles({ result: majorityResult, confidence: averageConfidence });
+
+        // Update the original file result in files state with average result
+        const updatedFiles = files.map(file =>
+            file.id === 0 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
+        );
+        setFiles(updatedFiles);
     };
 
     const encodeWAV = (samples, sampleRate, numChannels) => {
@@ -141,20 +162,6 @@ export default function Job() {
         }
 
         return buffer;
-    };
-
-    const updateFiles = (result) => {
-        // Add the uploaded file to the audio files list with average confidence result
-        const newFile = {
-            id: files.length + 1, // Incremental ID
-            url: preview, // Use the preview URL for the uploaded file
-            waveColor: '#FFFFFF',
-            progressColor: result.confidence > 0.5 ? 'green' : 'red', // Green for real, red for fake
-            size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
-            filename: file.name,
-            isReal: result.confidence > 0.5 // True for real, false for fake
-        };
-        setFiles([...files, newFile]); // Add the new file to the list
     };
 
     const handleOnClick = (index) => {
@@ -244,10 +251,15 @@ export default function Job() {
                                                 <button onClick={handleUpload} className="btn btn-two">Upload</button>
                                             </div>
                                         </div>
-                                        {uploadResult && (
+                                        {averageResult.result && (
                                             <div className="content pb-40">
-                                                <p>Result: {uploadResult.result}</p>
-                                                <p>Confidence: {uploadResult.confidence}</p>
+                                                <p>Average Result: {averageResult.result}</p>
+                                                <p>Average Confidence: {averageResult.confidence.toFixed(2)}</p>
+                                                {averageResult.confidence > 0.5 ? (
+                                                    <img src="/path/to/real_image.png" alt="Real" style={{ width: '120px' }} />
+                                                ) : (
+                                                    <img src="/path/to/fake_image.png" alt="Fake" style={{ width: '120px' }} />
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -255,22 +267,25 @@ export default function Job() {
                                 <div className="col-lg-9">
                                     <div className="contact-form audiolist">
                                         <div className="job-item-wrap">
-                                            {files.map((audio, index) => (
-                                                <div className="job-item" key={index}>
+                                            {/* Original Audio Waveform */}
+                                            {files.length > 0 && (
+                                                <div className="job-item">
                                                     <Waveform
-                                                        key={audio.id}
-                                                        audioUrl={audio.url}
-                                                        waveColor={audio.waveColor}
-                                                        progressColor={audio.progressColor}
-                                                        size={audio.size}
-                                                        filename={audio.filename}
-                                                        IsReal={audio.isReal}
-                                                        onPlay={() => handlePlay(audio.id)}
-                                                        audioId={audio.id}
+                                                        key={files[0].id}
+                                                        audioUrl={files[0].url}
+                                                        waveColor={files[0].waveColor}
+                                                        progressColor={files[0].progressColor}
+                                                        size={files[0].size}
+                                                        filename={files[0].filename}
+                                                        IsReal={files[0].isReal}
+                                                        onPlay={() => handlePlay(files[0].id)}
+                                                        audioId={files[0].id}
                                                         handleDelete={handleDelete} // Pass the delete handler here
+                                                        fakeImageUrl="/path/to/fake_image.png"
+                                                        realImageUrl="/path/to/real_image.png"
                                                     />
                                                 </div>
-                                            ))}
+                                            )}
                                         </div>
                                     </div>
                                 </div>
