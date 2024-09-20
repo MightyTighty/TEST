@@ -5,8 +5,6 @@ import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Switch from "react-switch";
 import { useRouter } from 'next/router';
-import WaveSurfer from 'wavesurfer.js';
-import { Chart } from 'chart.js';
 
 export default function Job() {
     const router = useRouter();
@@ -23,9 +21,9 @@ export default function Job() {
     const [preview, setPreview] = useState("assets/img/voice/upload.png");
     const [uploadResult, setUploadResult] = useState(null);
 
-    const sampleRate = 16000;
-    const recordingDurationMs = 2000;
-    const numSamples = sampleRate * (recordingDurationMs / 1000);
+    const sampleRate = 16000;  // Desired sample rate for audio processing
+    const recordingDurationMs = 2000;  // Duration for each audio chunk (2 seconds)
+    const numSamples = sampleRate * (recordingDurationMs / 1000);  // Number of samples per chunk
     const audioContextRef = useRef(null);
     const mediaRecorderRef = useRef(null);
     const recordingTimeoutRef = useRef(null);
@@ -59,107 +57,6 @@ export default function Job() {
             const objectUrl = URL.createObjectURL(selectedFile);
             setPreview(objectUrl);
         }
-    };
-
-    const handleUpload = async () => {
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        let token = localStorage.getItem("token");
-
-        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            body: formData
-        });
-
-        if (response.status === 401) {
-            // Token might be expired, try refreshing it
-            const refresh = localStorage.getItem('refresh');
-            const refreshResponse = await fetch('http://127.0.0.1:8000/token/refresh/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ refresh })
-            });
-
-            const refreshData = await refreshResponse.json();
-
-            if (refreshData.access) {
-                // Update token in localStorage
-                localStorage.setItem('token', refreshData.access);
-                token = refreshData.access;
-
-                // Retry the upload with the new token
-                const retryResponse = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-
-                if (retryResponse.ok) {
-                    const result = await retryResponse.json();
-                    setUploadResult(result);
-                    updateFiles(result); // Update files with the response
-                } else {
-                    console.error('Error uploading file after token refresh:', await retryResponse.json());
-                }
-            } else {
-                console.error('Failed to refresh token:', refreshData);
-                // Redirect to login or handle token refresh failure
-            }
-        } else if (response.ok) {
-            const result = await response.json();
-            setUploadResult(result);
-            updateFiles(result); // Update files with the response
-        } else {
-            console.error('Error uploading file:', await response.json());
-        }
-    };
-
-    const updateFiles = (result) => {
-        // Add the uploaded file to the audio files list
-        const newFile = {
-            id: files.length + 1, // Incremental ID
-            url: preview, // Use the preview URL for the uploaded file
-            waveColor: '#FFFFFF',
-            progressColor: result.result === 'real' ? 'green' : 'red', // Green for real, red for fake
-            size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
-            filename: file.name,
-            isReal: result.result === 'real' // True for real, false for fake
-        };
-        setFiles([...files, newFile]); // Add the new file to the list
-    };
-
-    const handleOnClick = (index) => {
-        setActiveIndex(index);
-    };
-
-    const handleChange = (checked) => {
-        setIsChecked(!checked);
-    };
-
-    const openFileInput = () => {
-        document.getElementById('file-upload').click();
-    };
-
-    const handlePlay = (id) => {
-        if (currentPlaying && currentPlaying !== id) {
-            document.querySelector(`button[data-id="${currentPlaying}"]`).click();
-        }
-        setCurrentPlaying(id);
-    };
-
-    const handleDelete = (id) => {
-        // Filter out the file with the specified ID from the files list
-        setFiles(files.filter(file => file.id !== id));
     };
 
     const startRecording = async () => {
