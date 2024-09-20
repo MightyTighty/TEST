@@ -229,13 +229,19 @@ export default function Job() {
                                                         onPlay={() => handlePlay(audio.id)}
                                                         audioId={audio.id}
                                                     />
-                                                    <button 
-                                                        onClick={() => handleDelete(audio.id)} 
-                                                        className="btn btn-danger btn-sm mt-2"
-                                                        style={{ display: 'block', margin: 'auto' }}
-                                                    >
-                                                        Remove
-                                                    </button>
+                                                    <img
+                                                        src="/assets/img/voice/deleteicon.png" // Delete icon path
+                                                        alt="Delete"
+                                                        onClick={() => handleDelete(audio.id)} // Delete handler
+                                                        className="delete-icon"
+                                                        style={{
+                                                            width: '24px',
+                                                            height: '24px',
+                                                            cursor: 'pointer',
+                                                            display: 'block',
+                                                            margin: '10px auto',
+                                                        }}
+                                                    />
                                                 </div>
                                             ))}
                                         </div>
