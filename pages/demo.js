@@ -39,6 +39,18 @@ export default function Job() {
             setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
             setPreview(objectUrl);
+
+            // Update files state to include the original file
+            const newFile = {
+                id: 0, // Use ID 0 for the original file
+                url: objectUrl,
+                waveColor: '#FFFFFF',
+                progressColor: '#FF9900',
+                size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
+                filename: selectedFile.name,
+                isReal: null // Set as null for now since we don't have the result
+            };
+            setFiles([newFile]); // Reset files list with the original file
         }
     };
 
@@ -99,6 +111,9 @@ export default function Job() {
         const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
 
         setAverageResult({ result: majorityResult, confidence: averageConfidence });
+
+        // Update the original file result in files state
+        setFiles(files.map(file => file.id === 0 ? { ...file, isReal: majorityResult === 'real' } : file));
     };
 
     const encodeWAV = (samples, sampleRate, numChannels) => {
@@ -257,15 +272,24 @@ export default function Job() {
                                 <div className="col-lg-9">
                                     <div className="contact-form audiolist">
                                         <div className="job-item-wrap">
-                                            {/* Original Audio Player */}
-                                            {file && (
+                                            {/* Original Audio Waveform */}
+                                            {files.length > 0 && (
                                                 <div className="job-item">
-                                                    <audio controls src={preview} style={{ width: '100%' }}>
-                                                        Your browser does not support the audio element.
-                                                    </audio>
+                                                    <Waveform
+                                                        key={files[0].id}
+                                                        audioUrl={files[0].url}
+                                                        waveColor={files[0].waveColor}
+                                                        progressColor={files[0].progressColor}
+                                                        size={files[0].size}
+                                                        filename={files[0].filename}
+                                                        IsReal={files[0].isReal}
+                                                        onPlay={() => handlePlay(files[0].id)}
+                                                        audioId={files[0].id}
+                                                        handleDelete={handleDelete} // Pass the delete handler here
+                                                    />
                                                 </div>
                                             )}
-                                            {files.map((audio, index) => (
+                                            {files.slice(1).map((audio, index) => (
                                                 <div className="job-item" key={index}>
                                                     <Waveform
                                                         key={audio.id}
