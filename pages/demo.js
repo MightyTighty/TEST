@@ -7,8 +7,6 @@ import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Switch from "react-switch";
 import { useRouter } from 'next/navigation';
-localStorage.setItem('token', data.access);
-localStorage.setItem('refresh', data.refresh);
 
 
 const audioFiles = [
