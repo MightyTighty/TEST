@@ -1,11 +1,12 @@
 import Layout from "@/components/layout/Layout";
-import Link from "next/link";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Waveform from "@/components/elements/Waveform";
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Switch from "react-switch";
 import { useRouter } from 'next/router';
+import WaveSurfer from 'wavesurfer.js';
+import { Chart } from 'chart.js';
 
 export default function Job() {
     const router = useRouter();
@@ -14,17 +15,36 @@ export default function Job() {
     const [files, setFiles] = useState([]); // Initially empty, to be populated after upload
     const [isChecked, setIsChecked] = useState(true);
     const [currentPlaying, setCurrentPlaying] = useState(null);
+    const [recordingChunks, setRecordingChunks] = useState([]);
+    const [isRecording, setIsRecording] = useState(false);
 
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("assets/img/voice/upload.png");
     const [uploadResult, setUploadResult] = useState(null);
 
+    const sampleRate = 16000;
+    const recordingDurationMs = 2000;
+    const numSamples = sampleRate * (recordingDurationMs / 1000);
+    const audioContextRef = useRef(null);
+    const mediaRecorderRef = useRef(null);
+    const recordingTimeoutRef = useRef(null);
+    const chunkCounterRef = useRef(0);
+
     useEffect(() => {
         const tok = localStorage.getItem("token");
         if (tok) {
             setToken(tok);
         }
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            // Cleanup function
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+            }
+        };
     }, []);
 
     const handleFileChange = (event) => {
@@ -142,6 +162,146 @@ export default function Job() {
         setFiles(files.filter(file => file.id !== id));
     };
 
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            audioContextRef.current = new AudioContext({ sampleRate: sampleRate });
+            const source = audioContextRef.current.createMediaStreamSource(stream);
+            const processor = audioContextRef.current.createScriptProcessor(4096, 1, 1);
+
+            processor.onaudioprocess = (event) => {
+                const input = event.inputBuffer.getChannelData(0);
+                const buffer = new Float32Array(input.length);
+                buffer.set(input);
+                setRecordingChunks(prevChunks => [...prevChunks, buffer]);
+            };
+
+            source.connect(processor);
+            processor.connect(audioContextRef.current.destination);
+
+            mediaRecorderRef.current = new MediaRecorder(stream);
+            mediaRecorderRef.current.ondataavailable = async (event) => {
+                if (event.data.size > 0) {
+                    const arrayBuffer = await event.data.arrayBuffer();
+                    const float32Array = new Float32Array(arrayBuffer);
+                    setRecordingChunks(prevChunks => [...prevChunks, float32Array]);
+                }
+            };
+
+            mediaRecorderRef.current.onstop = async () => {
+                processRecordingChunks(recordingChunks);
+                setRecordingChunks([]);
+            };
+
+            setIsRecording(true);
+            const recordInterval = () => {
+                if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'inactive') {
+                    mediaRecorderRef.current.start();
+                }
+                recordingTimeoutRef.current = setTimeout(() => {
+                    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+                        mediaRecorderRef.current.stop();
+                        setTimeout(recordInterval, 0);
+                    }
+                }, recordingDurationMs);
+            };
+            recordInterval();
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+        }
+    };
+
+    const stopRecording = () => {
+        clearTimeout(recordingTimeoutRef.current);
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
+        }
+        setIsRecording(false);
+    };
+
+    const processRecordingChunks = (audioChunks) => {
+        const totalLength = audioChunks.reduce((acc, chunk) => acc + chunk.length, 0);
+        if (totalLength >= numSamples) {
+            const audioBuffer = mergeBuffers(audioChunks, numSamples);
+            uploadChunk(audioBuffer, `file-part${chunkCounterRef.current}`, true);
+            chunkCounterRef.current++;
+        } else {
+            console.warn(`Recorded length (${totalLength}) less than expected (${numSamples}).`);
+        }
+    };
+
+    const mergeBuffers = (bufferArray, length) => {
+        const result = new Float32Array(length);
+        let offset = 0;
+        bufferArray.forEach(buffer => {
+            if (offset + buffer.length <= length) {
+                result.set(buffer, offset);
+                offset += buffer.length;
+            } else {
+                result.set(buffer.subarray(0, length - offset), offset);
+                offset = length;
+            }
+        });
+        return result;
+    };
+
+    const uploadChunk = (chunk, fileName, isRecording) => {
+        const wavBuffer = encodeWAV(chunk, sampleRate, 1);
+        const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+        const audioFile = new File([wavBlob], `${fileName}.wav`, { type: 'audio/wav' });
+        const formData = new FormData();
+        formData.append('file', audioFile);
+
+        fetch('http://127.0.0.1:8000/api/upload/', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server Response:', data);
+                // Additional logic for processing the response can be added here.
+            })
+            .catch(error => {
+                console.error('Error uploading file:', error);
+            });
+    };
+
+    const encodeWAV = (samples, sampleRate, numChannels) => {
+        const buffer = new ArrayBuffer(44 + samples.length * 2);
+        const view = new DataView(buffer);
+
+        writeString(view, 0, 'RIFF');
+        view.setUint32(4, 36 + samples.length * 2, true);
+        writeString(view, 8, 'WAVE');
+        writeString(view, 12, 'fmt ');
+        view.setUint32(16, 16, true);
+        view.setUint16(20, 1, true);
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * numChannels * 2, true);
+        view.setUint16(32, numChannels * 2, true);
+        view.setUint16(34, 16, true);
+        writeString(view, 36, 'data');
+        view.setUint32(40, samples.length * 2, true);
+
+        floatTo16BitPCM(view, 44, samples);
+
+        return buffer;
+    };
+
+    const writeString = (view, offset, string) => {
+        for (let i = 0; i < string.length; i++) {
+            view.setUint8(offset + i, string.charCodeAt(i));
+        }
+    };
+
+    const floatTo16BitPCM = (view, offset, input) => {
+        for (let i = 0; i < input.length; i++, offset += 2) {
+            const s = Math.max(-1, Math.min(1, input[i]));
+            view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+        }
+    };
+
     return (
         <>
             <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={<>Try a <span>Demo</span></>}>
@@ -233,6 +393,10 @@ export default function Job() {
                                                 </div>
                                             ))}
                                         </div>
+                                    </div>
+                                    <div className="controls">
+                                        <button onClick={startRecording} disabled={isRecording} className="btn btn-primary">Start Recording</button>
+                                        <button onClick={stopRecording} disabled={!isRecording} className="btn btn-secondary">Stop Recording</button>
                                     </div>
                                 </div>
                             </div>
