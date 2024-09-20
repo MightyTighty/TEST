@@ -7,6 +7,9 @@ import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Switch from "react-switch";
 import { useRouter } from 'next/navigation';
+localStorage.setItem('token', data.access);
+localStorage.setItem('refresh', data.refresh);
+
 
 const audioFiles = [
     {
@@ -76,64 +79,31 @@ export default function Job() {
 
     const handleUpload = async () => {
         if (!file) return;
-    
+
         const formData = new FormData();
         formData.append('file', file);
-    
-        let token = localStorage.getItem("token");
-    
-        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            body: formData
-        });
-    
-        if (response.status === 401) {
-            // Token might be expired, try refreshing it
-            const refresh = localStorage.getItem('refresh');
-            const refreshResponse = await fetch('http://127.0.0.1:8000/token/refresh/', {
+
+        try {
+            const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ refresh })
+                body: formData
             });
-    
-            const refreshData = await refreshResponse.json();
-    
-            if (refreshData.access) {
-                localStorage.setItem('token', refreshData.access);
-                token = refreshData.access;
-    
-                // Retry the upload with the new token
-                const retryResponse = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData
-                });
-    
-                if (retryResponse.ok) {
-                    const result = await retryResponse.json();
-                    setUploadResult(result);
-                } else {
-                    console.error('Error uploading file after token refresh:', await retryResponse.json());
-                }
+
+            if (response.ok) {
+                const result = await response.json();
+                setUploadResult(result);
             } else {
-                console.error('Failed to refresh token:', refreshData);
-                // Redirect to login or handle token refresh failure
+                const error = await response.json();
+                console.error('Error uploading file:', error);
             }
-        } else if (response.ok) {
-            const result = await response.json();
-            setUploadResult(result);
-        } else {
-            console.error('Error uploading file:', await response.json());
+        } catch (error) {
+            console.error('Error uploading file:', error);
         }
     };
-    
+
 
    
 
