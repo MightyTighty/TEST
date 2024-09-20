@@ -36,16 +36,14 @@ const signout=()=>{
                                                
                                                 <li><Link href="/">Home</Link></li>
                                                 <li><Link href="/contact">contacts</Link></li>
-                                                <li><Link href="/#howitwork">How It Works</Link></li>
+                                                <li><Link href="/work">How It Works</Link></li>
                                                 <li><Link href="/#Pricing">Pricing</Link></li>
                                             </ul>
                                         </div>
                                         <div className="header-action d-none d-md-block">
                                             <ul className="list-wrap">
                                             <li className="header-btn"><Link href="/demo" className="btn btn-primary">Request Demo</Link></li>
-                                                <li className="header-lang">
-                                                    <LanguageDropdown />
-                                                </li>
+                                           
                                               {
                                                 (tokan=="" || tokan==undefined)?<li className="header-btn"><Link href="/login" className="btn">sign in</Link></li>:
                                                 <li className="header-btn"><button onClick={() => signout()} className="btn">sign out</button></li>
