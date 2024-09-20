@@ -245,6 +245,11 @@ export default function Job() {
                                             <div className="content pb-40">
                                                 <p>Average Result: {averageResult.result}</p>
                                                 <p>Average Confidence: {averageResult.confidence.toFixed(2)}</p>
+                                                {averageResult.confidence > 0.5 ? (
+                                                    <img src="assets/img/real.png" alt="Real" style={{ width: '120px' }} />
+                                                ) : (
+                                                    <img src="assets/img/fake.png" alt="Fake" style={{ width: '120px' }} />
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -252,6 +257,14 @@ export default function Job() {
                                 <div className="col-lg-9">
                                     <div className="contact-form audiolist">
                                         <div className="job-item-wrap">
+                                            {/* Original Audio Player */}
+                                            {file && (
+                                                <div className="job-item">
+                                                    <audio controls src={preview} style={{ width: '100%' }}>
+                                                        Your browser does not support the audio element.
+                                                    </audio>
+                                                </div>
+                                            )}
                                             {files.map((audio, index) => (
                                                 <div className="job-item" key={index}>
                                                     <Waveform
