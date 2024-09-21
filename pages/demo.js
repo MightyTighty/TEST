@@ -229,15 +229,7 @@ export default function Job() {
                                             onDragOver={handleDragOver} // Allow dropping
                                             onDrop={handleDrop} // Handle drop event
                                             onClick={openFileInput} // Open file dialog on click
-                                            style={{
-                                                width: '100%',
-                                                height: '120px',
-                                                border: '1.5px solid #FF9900',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                cursor: 'pointer'
-                                            }}
+                                           
                                         >
                                             <input
                                                 type="file"
