@@ -129,6 +129,8 @@ export default function Job() {
                 if (result.result === 'real') isRealCount++;
             }
         }
+        setPreview("File Uploaded"); // <-- Add this line here
+
 
         // Calculate average result
         const averageConfidence = totalConfidence / totalResults;
@@ -224,14 +226,14 @@ export default function Job() {
                                 <div className="col-lg-3">
                                     <div className="responds-wrap uploadarea">
                                         <div
-                                            className="icon"
+                                            className="contact-form audiolist"
                                             onDragOver={handleDragOver} // Allow dropping
                                             onDrop={handleDrop} // Handle drop event
                                             onClick={openFileInput} // Open file dialog on click
                                             style={{
                                                 width: '100%',
                                                 height: '120px',
-                                                border: '2px dashed #ccc',
+                                                border: '1.5px solid #FF9900',
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
