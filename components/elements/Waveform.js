@@ -1,28 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
 import WaveSurfer from 'wavesurfer.js';
-import { FaPlay, FaPause } from 'react-icons/fa';
 
-const Waveform = ({ 
-  audioUrl, 
-  waveColor, 
-  progressColor, 
-  size, 
-  filename, 
-  IsReal, 
-  forHome, 
-  onPlay, 
-  audioId, 
-  handleDelete 
+const Waveform = ({
+  audioUrl,
+  waveColor,
+  progressColor,
+  size,
+  filename,
+  IsReal,
+  forHome,
+  onPlay,
+  audioId,
+  handleDelete
 }) => {
   const waveformRef = useRef(null);
   const wavesurferRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    // Initialize WaveSurfer
+    // Destroy previous WaveSurfer instance if it exists
     if (wavesurferRef.current) {
-      wavesurferRef.current.destroy(); // Destroy previous instance to prevent overlapping
+      wavesurferRef.current.destroy();
     }
+
+    // Initialize WaveSurfer
     wavesurferRef.current = WaveSurfer.create({
       container: waveformRef.current,
       waveColor: waveColor || '#ffffff',
@@ -35,13 +36,13 @@ const Waveform = ({
       barWidth: size.barWidth || 3,
       hideScrollbar: true,
       normalize: true,
-      responsive: true, // Add responsive to re-render properly
-      partialRender: true, // Improve performance with large files
+      responsive: true,
+      partialRender: true, // For performance
     });
 
     // Cleanup on component unmount
-    return () => wavesurferRef.current?.destroy();
-  }, [audioUrl, waveColor, progressColor, size]); // Recreate on prop changes
+    return () => wavesurferRef.current.destroy();
+  }, [audioUrl, waveColor, progressColor, size]);
 
   const togglePlayPause = () => {
     if (wavesurferRef.current) {
@@ -51,21 +52,21 @@ const Waveform = ({
       } else {
         wavesurferRef.current.play();
         setIsPlaying(true);
-        if (onPlay) onPlay(); // Notify parent component
+        if (onPlay) onPlay(audioId); // Notify parent which audio is being played
       }
     }
   };
 
   return (
-    <div className='wafeformmainclass'>
-      <button 
-        onClick={togglePlayPause} 
+    <div className='waveform-main'>
+      <button
+        onClick={togglePlayPause}
         data-id={audioId}
-        style={{ display: 'flex', alignItems: 'center', margin: '10px', border: 'none', background: 'none' }}
+        style={{ display: 'flex', alignItems: 'center', marginTop: '10px', border: 'none', background: 'none' }}
       >
-        <img 
-          src={isPlaying ? (IsReal ? "/assets/img/voice/RealPauseIcon.png" : "/assets/img/voice/FakePauseIcon.png") : (IsReal ? "/assets/img/voice/RealPlayIcon.png" : "/assets/img/voice/FakePlayIcon.png")} 
-          alt={isPlaying ? "Pause" : "Play"} 
+        <img
+          src={isPlaying ? (IsReal ? "/assets/img/voice/RealPauseIcon.png" : "/assets/img/voice/FakePauseIcon.png") : (IsReal ? "/assets/img/voice/RealPlayIcon.png" : "/assets/img/voice/FakePlayIcon.png")}
+          alt={isPlaying ? "Pause" : "Play"}
           style={{ width: '50px', height: 'auto' }}
         />
       </button>
@@ -73,17 +74,16 @@ const Waveform = ({
         {!forHome && <p>{filename}</p>} {/* Show filename if not forHome */}
         <div ref={waveformRef}></div> {/* Waveform container */}
       </div>
-      <div 
-        style={{ display: forHome ? 'none' : 'flex', alignItems: 'center', margin: '10px', border: 'none', background: 'none' }}
+      <div
+        style={{ display: forHome ? 'none' : 'flex', alignItems: 'center', marginTop: '10px', border: 'none', background: 'none' }}
       >
-        <img 
-          src={forHome ? "" : "/assets/img/voice/reportIcon.png"}  
-          alt="Report"
+        <img
+          src={forHome ? "" : "/assets/img/voice/reportIcon.png"}
           style={{ width: '30px', height: 'auto', margin: '10px' }}
         />
         <span className={IsReal ? "realspan" : "fakespan"}>{!forHome ? (IsReal ? "Real" : "Fake") : ""}</span>
-        <img 
-          src={forHome ? "" : "/assets/img/voice/deleteicon.png"}  
+        <img
+          src={forHome ? "" : "/assets/img/voice/deleteicon.png"}
           alt="Delete"
           onClick={() => handleDelete(audioId)} // Handle delete action
           style={{ width: '30px', height: 'auto', margin: '10px', cursor: 'pointer' }}
