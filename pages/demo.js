@@ -76,57 +76,49 @@ export default function Job() {
     };
 
     // Function to handle file upload and chunking
-    const handleUpload = async (event) => {
-        event.preventDefault();
-        if (!file) {
-            console.error("No file selected for upload!");
-            return;
-        }
+    const handleUpload = async () => {
+        if (!file) return;
 
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const arrayBuffer = await file.arrayBuffer();
-            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuffer = await file.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
-            const chunkDuration = 2; // 2 seconds
-            const chunkSize = chunkDuration * audioBuffer.sampleRate; // Number of samples in 2 seconds
-            const totalChunks = Math.ceil(audioBuffer.length / chunkSize);
+        const chunkDuration = 2; // 2 seconds
+        const chunkSize = chunkDuration * audioBuffer.sampleRate; // Number of samples in 2 seconds
+        const totalChunks = Math.ceil(audioBuffer.length / chunkSize);
 
-            let totalConfidence = 0;
-            let totalResults = 0;
-            let isRealCount = 0;
+        let totalConfidence = 0;
+        let totalResults = 0;
+        let isRealCount = 0;
 
-            for (let i = 0; i < totalChunks; i++) {
-                const start = i * chunkSize;
-                const end = Math.min((i + 1) * chunkSize, audioBuffer.length);
-                const chunk = audioBuffer.getChannelData(0).slice(start, end);
+        for (let i = 0; i < totalChunks; i++) {
+            const start = i * chunkSize;
+            const end = Math.min((i + 1) * chunkSize, audioBuffer.length);
+            const chunk = audioBuffer.getChannelData(0).slice(start, end);
 
-                const wavBuffer = encodeWAV(chunk, audioBuffer.sampleRate, 1);
-                const chunkBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+            const wavBuffer = encodeWAV(chunk, audioBuffer.sampleRate, 1);
+            const chunkBlob = new Blob([wavBuffer], { type: 'audio/wav' });
 
-                const result = await uploadChunk(chunkBlob, i);
-                if (result) {
-                    totalConfidence += result.confidence;
-                    totalResults++;
+            const result = await uploadChunk(chunkBlob, i);
+            if (result) {
+                totalConfidence += result.confidence;
+                totalResults++;
 
-                    if (result.result === 'real') isRealCount++;
-                }
+                if (result.result === 'real') isRealCount++;
             }
-
-            // Calculate average result
-            const averageConfidence = totalConfidence / totalResults;
-            const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
-
-            setAverageResult({ result: majorityResult, confidence: averageConfidence });
-
-            // Update the original file result in files state with average result
-            const updatedFiles = files.map(file =>
-                file.id === 0 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
-            );
-            setFiles(updatedFiles);
-        } catch (error) {
-            console.error("Error during upload: ", error);
         }
+
+        // Calculate average result
+        const averageConfidence = totalConfidence / totalResults;
+        const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
+
+        setAverageResult({ result: majorityResult, confidence: averageConfidence });
+
+        // Update the original file result in files state with average result
+        const updatedFiles = files.map(file =>
+            file.id === 0 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
+        );
+        setFiles(updatedFiles);
     };
 
     const encodeWAV = (samples, sampleRate, numChannels) => {
@@ -210,7 +202,7 @@ export default function Job() {
                                 <div className="col-lg-3">
                                     <div className="responds-wrap uploadarea">
                                         <div
-                                            className="contact-form audiolist"
+                                            className="drag-and-drop-box" // Apply theme class here
                                             onDragOver={handleDragOver} // Allow dropping
                                             onDrop={handleDrop} // Handle drop event
                                             onClick={openFileInput} // Open file dialog on click
@@ -222,7 +214,7 @@ export default function Job() {
                                                 style={{ display: 'none' }}
                                                 id="file-upload"
                                             />
-                                            <span>{preview}</span>
+                                            <span>{preview}</span> {/* Show the upload message here */}
                                         </div>
 
                                         <div className="content pb-40">
