@@ -202,7 +202,7 @@ export default function Job() {
                                 <div className="col-lg-3">
                                     <div className="responds-wrap uploadarea">
                                         <div
-                                            className="drag-and-drop-box" // Apply theme class here
+                                            className="contact-form audiolist" // Apply theme class here
                                             onDragOver={handleDragOver} // Allow dropping
                                             onDrop={handleDrop} // Handle drop event
                                             onClick={openFileInput} // Open file dialog on click
