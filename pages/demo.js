@@ -10,14 +10,14 @@ export default function Job() {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(1);
     const [isImageVisible, setImageVisible] = useState(true);
-    const [files, setFiles] = useState([]); // Initially empty, to be populated after upload
+    const [files, setFiles] = useState([]); // Keep all files in an array
     const [isChecked, setIsChecked] = useState(true);
     const [currentPlaying, setCurrentPlaying] = useState(null);
 
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("Drag & Drop or Click to Upload Audio");
-    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 }); // Store average result
+    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 });
 
     useEffect(() => {
         const tok = localStorage.getItem("token");
@@ -31,14 +31,14 @@ export default function Job() {
         if (!tok) {
             router.push("/login");
         }
-    
+
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview("File Ready to Upload"); // Display custom message
-    
-            // Update files state to include the original file, keeping previous files
+            setPreview("File Ready to Upload");
+
+            // Add the new file to the list of files
             const newFile = {
                 id: files.length, // Use length as ID for new files
                 url: objectUrl,
@@ -48,23 +48,25 @@ export default function Job() {
                 filename: selectedFile.name,
                 isReal: null // Set as null for now since we don't have the result
             };
-            setFiles((prevFiles) => [...prevFiles, newFile]); // Append new file to previous files
+            setFiles([...files, newFile]); // Append new file to previous files
         }
     };
     
-    // Handle drag and drop events
+      // Handle drag and drop events
     const handleDragOver = (event) => {
         event.preventDefault(); // Allow drop
     };
+
+
 
     const handleDrop = (event) => {
         event.preventDefault();
         const selectedFile = event.dataTransfer.files[0];
         if (selectedFile) {
             setFile(selectedFile);
-            setPreview("File Ready to Upload"); // Display custom message
-    
-            // Update files state to include the original file, keeping previous files
+            setPreview("File Ready to Upload");
+
+            // Add the new file to the list of files
             const newFile = {
                 id: files.length, // Use length as ID for new files
                 url: URL.createObjectURL(selectedFile),
@@ -74,9 +76,10 @@ export default function Job() {
                 filename: selectedFile.name,
                 isReal: null // Set as null for now since we don't have the result
             };
-            setFiles((prevFiles) => [...prevFiles, newFile]); // Append new file to previous files
+            setFiles([...files, newFile]); // Append new file to previous files
         }
     };
+
     
 
     // Function to upload chunks of the audio file
@@ -232,8 +235,7 @@ export default function Job() {
                                             className="contact-form audiolist"
                                             onDragOver={handleDragOver} // Allow dropping
                                             onDrop={handleDrop} // Handle drop event
-                                            onClick={openFileInput} // Open file dialog on click
-                                           
+                                            onClick={() => document.getElementById('file-upload').click()} // Open file dialog on click
                                         >
                                             <input
                                                 type="file"
@@ -243,13 +245,11 @@ export default function Job() {
                                                 id="file-upload"
                                             />
                                             <span>{file ? preview : 'Drag & Drop or Click to Upload Audio'}</span>
-
                                         </div>
-
                                         <div className="content pb-40">
                                             <p>Noise Suppression</p>
                                             <label>
-                                                <Switch onChange={() => handleChange(isChecked)} checked={isChecked} />
+                                                <Switch onChange={() => setIsChecked(!isChecked)} checked={isChecked} />
                                             </label>
                                         </div>
                                         <div className="content">
@@ -261,7 +261,6 @@ export default function Job() {
                                             <div className="content pb-40">
                                                 <p>Average Result: {averageResult.result}</p>
                                                 <p>Average Confidence: {averageResult.confidence.toFixed(2)}</p>
-                                                
                                             </div>
                                         )}
                                     </div>
@@ -269,24 +268,22 @@ export default function Job() {
                                 <div className="col-lg-9">
                                     <div className="contact-form audiolist">
                                         <div className="job-item-wrap">
-                                            {/* Original Audio Waveform */}
-                                            {files.length > 0 && (
-                                                <div className="job-item">
+                                            {/* Display all uploaded files */}
+                                            {files.map((file, index) => (
+                                                <div className="job-item" key={file.id}>
                                                     <Waveform
-                                                        key={files[0].id}
-                                                        audioUrl={files[0].url}
-                                                        waveColor={files[0].waveColor}
-                                                        progressColor={files[0].progressColor}
-                                                        size={files[0].size}
-                                                        filename={files[0].filename}
-                                                        IsReal={files[0].isReal}
-                                                        onPlay={() => handlePlay(files[0].id)}
-                                                        audioId={files[0].id}
-                                                        handleDelete={handleDelete} // Pass the delete handler here
-                                                        
+                                                        audioUrl={file.url}
+                                                        waveColor={file.waveColor}
+                                                        progressColor={file.progressColor}
+                                                        size={file.size}
+                                                        filename={file.filename}
+                                                        IsReal={file.isReal}
+                                                        onPlay={() => handlePlay(file.id)}
+                                                        audioId={file.id}
+                                                        handleDelete={() => handleDelete(file.id)} // Pass delete handler
                                                     />
                                                 </div>
-                                            )}
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
