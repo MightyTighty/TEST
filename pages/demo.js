@@ -39,23 +39,20 @@ export default function Job() {
             // Create a preview URL
             const objectUrl = URL.createObjectURL(selectedFile);
     
-            // Create a new file object similar to the audioFiles structure
             const newFile = {
-                id: Date.now(), // Generate a unique ID
+                id: Date.now(), // Use a unique ID like Date.now()
                 url: objectUrl,
-                waveColor: '#FFFFFF', // Set wave color
-                progressColor: 'orange', // Set a default progress color (can be customized later)
-                size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 }, // Define the size
-                filename: selectedFile.name, // Use the file name
-                isReal: null // Initially, no info about real or fake
+                waveColor: '#FFFFFF',
+                progressColor: '#FF9900',
+                size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
+                filename: selectedFile.name,
+                isReal: null // Set as null for now since we don't have the result
             };
     
-            // Add the new file to the existing list of files
-            setFiles((prevFiles) => [...prevFiles, newFile]);
-            setPreview("File Ready to Upload"); // Set the preview message to indicate readiness
+            setFiles((prevFiles) => [...prevFiles, newFile]); // Append the new file to the existing files
+            setPreview("File Ready to Upload"); // Set the preview to a general message
         }
     };
-    
     
     
     // Handle drag and drop events
