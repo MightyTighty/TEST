@@ -16,7 +16,7 @@ export default function Job() {
 
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState("assets/img/voice/upload.png");
+    const [preview, setPreview] = useState("Drag & Drop or Click to Upload Audio");
     const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 }); // Store average result
 
     useEffect(() => {
@@ -30,27 +30,60 @@ export default function Job() {
         const tok = localStorage.getItem("token");
         if (!tok) {
             router.push("/login");
+            return;
         }
-
+    
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
+            // Create a preview URL
             const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview(objectUrl);
-
-            // Update files state to include the original file
+    
+            // Create a new file object similar to the audioFiles structure
             const newFile = {
-                id: 0, // Use ID 0 for the original file
+                id: Date.now(), // Generate a unique ID
                 url: objectUrl,
+                waveColor: '#FFFFFF', // Set wave color
+                progressColor: 'orange', // Set a default progress color (can be customized later)
+                size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 }, // Define the size
+                filename: selectedFile.name, // Use the file name
+                isReal: null // Initially, no info about real or fake
+            };
+    
+            // Add the new file to the existing list of files
+            setFiles((prevFiles) => [...prevFiles, newFile]);
+            setPreview("File Ready to Upload"); // Set the preview message to indicate readiness
+        }
+    };
+    
+    
+    
+    // Handle drag and drop events
+    const handleDragOver = (event) => {
+        event.preventDefault(); // Allow drop
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        const selectedFile = event.dataTransfer.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setPreview("File Ready to Upload"); // Display custom message
+    
+            // Update files state to include the original file, keeping previous files
+            const newFile = {
+                id: files.length, // Use length as ID for new files
+                url: URL.createObjectURL(selectedFile),
                 waveColor: '#FFFFFF',
                 progressColor: '#FF9900',
                 size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
                 filename: selectedFile.name,
                 isReal: null // Set as null for now since we don't have the result
             };
-            setFiles([newFile]); // Reset files list with the original file
+            setFiles((prevFiles) => [...prevFiles, newFile]); // Append new file to previous files
         }
     };
+    
 
     // Function to upload chunks of the audio file
     const uploadChunk = async (chunk, index) => {
@@ -74,49 +107,54 @@ export default function Job() {
     // Function to handle file upload and chunking
     const handleUpload = async () => {
         if (!file) return;
-
+    
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
+    
         const chunkDuration = 2; // 2 seconds
         const chunkSize = chunkDuration * audioBuffer.sampleRate; // Number of samples in 2 seconds
         const totalChunks = Math.ceil(audioBuffer.length / chunkSize);
-
+    
         let totalConfidence = 0;
         let totalResults = 0;
         let isRealCount = 0;
-
+    
         for (let i = 0; i < totalChunks; i++) {
             const start = i * chunkSize;
             const end = Math.min((i + 1) * chunkSize, audioBuffer.length);
             const chunk = audioBuffer.getChannelData(0).slice(start, end);
-
+    
             const wavBuffer = encodeWAV(chunk, audioBuffer.sampleRate, 1);
             const chunkBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-
+    
             const result = await uploadChunk(chunkBlob, i);
             if (result) {
                 totalConfidence += result.confidence;
                 totalResults++;
-
+    
                 if (result.result === 'real') isRealCount++;
             }
         }
-
+    
         // Calculate average result
         const averageConfidence = totalConfidence / totalResults;
         const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
-
+    
         setAverageResult({ result: majorityResult, confidence: averageConfidence });
-
+    
         // Update the original file result in files state with average result
         const updatedFiles = files.map(file =>
             file.id === 0 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
         );
         setFiles(updatedFiles);
+    
+        // Reset file and preview state to allow new uploads
+        setFile(null);
+        setPreview('Drag & Drop or Click to Upload Audio');
     };
-
+    
+    
     const encodeWAV = (samples, sampleRate, numChannels) => {
         const buffer = new ArrayBuffer(44 + samples.length * 2);
         const view = new DataView(buffer);
@@ -197,7 +235,13 @@ export default function Job() {
                             <div className="row">
                                 <div className="col-lg-3">
                                     <div className="responds-wrap uploadarea">
-                                        <div className="icon">
+                                        <div
+                                            className="contact-form audiolist"
+                                            onDragOver={handleDragOver} // Allow dropping
+                                            onDrop={handleDrop} // Handle drop event
+                                            onClick={openFileInput} // Open file dialog on click
+                                           
+                                        >
                                             <input
                                                 type="file"
                                                 onChange={handleFileChange}
@@ -205,43 +249,12 @@ export default function Job() {
                                                 style={{ display: 'none' }}
                                                 id="file-upload"
                                             />
-                                            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-                                                {preview ? (
-                                                    <img
-                                                        src={preview}
-                                                        alt="Image Preview"
-                                                        style={{ width: '120px', height: 'auto', marginBottom: '10px' }}
-                                                    />
-                                                ) : (
-                                                    <div style={{ width: '120px', height: '120px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <span>Upload Audio</span>
-                                                    </div>
-                                                )}
-                                            </label>
+                                            <span>{file ? preview : 'Drag & Drop or Click to Upload Audio'}</span>
+
                                         </div>
+
                                         <div className="content pb-40">
-                                            <a onClick={openFileInput}>Upload File</a>
-                                        </div>
-                                        <div className="content pb-40">
-                                            <p>Frame Length 2</p>
-                                            <RangeSlider
-                                                className="single-thumb"
-                                                defaultValue={[0, 50]}
-                                                thumbsDisabled={[true, false]}
-                                                rangeSlideDisabled={true}
-                                            />
-                                        </div>
-                                        <div className="content pb-40">
-                                            <p>Sensitivity 50%</p>
-                                            <RangeSlider
-                                                className="single-thumb"
-                                                defaultValue={[0, 50]}
-                                                thumbsDisabled={[true, false]}
-                                                rangeSlideDisabled={true}
-                                            />
-                                        </div>
-                                        <div className="content pb-40">
-                                            <p>Isolate Voice</p>
+                                            <p>Noise Suppression</p>
                                             <label>
                                                 <Switch onChange={() => handleChange(isChecked)} checked={isChecked} />
                                             </label>
@@ -255,11 +268,7 @@ export default function Job() {
                                             <div className="content pb-40">
                                                 <p>Average Result: {averageResult.result}</p>
                                                 <p>Average Confidence: {averageResult.confidence.toFixed(2)}</p>
-                                                {averageResult.confidence > 0.5 ? (
-                                                    <img src="/path/to/real_image.png" alt="Real" style={{ width: '120px' }} />
-                                                ) : (
-                                                    <img src="/path/to/fake_image.png" alt="Fake" style={{ width: '120px' }} />
-                                                )}
+                                                
                                             </div>
                                         )}
                                     </div>
@@ -281,8 +290,7 @@ export default function Job() {
                                                         onPlay={() => handlePlay(files[0].id)}
                                                         audioId={files[0].id}
                                                         handleDelete={handleDelete} // Pass the delete handler here
-                                                        fakeImageUrl="/path/to/fake_image.png"
-                                                        realImageUrl="/path/to/real_image.png"
+                                                        
                                                     />
                                                 </div>
                                             )}
