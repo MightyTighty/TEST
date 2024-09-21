@@ -206,17 +206,11 @@ export default function Job() {
                                                 id="file-upload"
                                             />
                                             <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-                                                {preview ? (
-                                                    <img
-                                                        src={preview}
-                                                        alt="Image Preview"
-                                                        style={{ width: '120px', height: 'auto', marginBottom: '10px' }}
-                                                    />
-                                                ) : (
+                                                (
                                                     <div style={{ width: '120px', height: '120px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                         <span>Upload Audio</span>
                                                     </div>
-                                                )}
+                                                )
                                             </label>
                                         </div>
                                         <div className="content pb-40">
