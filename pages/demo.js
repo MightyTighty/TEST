@@ -36,7 +36,8 @@ export default function Job() {
         if (selectedFile) {
             setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview(selectedFile.name); // Display file name instead of image
+            setPreview("File Ready to Upload");
+// Display file name instead of image
 
             // Update files state to include the original file
             const newFile = {
@@ -129,9 +130,7 @@ export default function Job() {
                 if (result.result === 'real') isRealCount++;
             }
         }
-        setPreview("File Uploaded"); // <-- Add this line here
-        setFile(null);
-
+      
 
         // Calculate average result
         const averageConfidence = totalConfidence / totalResults;
