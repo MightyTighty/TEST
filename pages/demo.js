@@ -30,17 +30,17 @@ export default function Job() {
         const tok = localStorage.getItem("token");
         if (!tok) {
             router.push("/login");
-            return;
         }
     
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
-            // Create a preview URL
             const objectUrl = URL.createObjectURL(selectedFile);
+            setPreview("File Ready to Upload"); // Display custom message
     
+            // Update files state to include the original file, keeping previous files
             const newFile = {
-                id: Date.now(), // Use a unique ID like Date.now()
+                id: files.length, // Use length as ID for new files
                 url: objectUrl,
                 waveColor: '#FFFFFF',
                 progressColor: '#FF9900',
@@ -48,12 +48,9 @@ export default function Job() {
                 filename: selectedFile.name,
                 isReal: null // Set as null for now since we don't have the result
             };
-    
-            setFiles((prevFiles) => [...prevFiles, newFile]); // Append the new file to the existing files
-            setPreview("File Ready to Upload"); // Set the preview to a general message
+            setFiles((prevFiles) => [...prevFiles, newFile]); // Append new file to previous files
         }
     };
-    
     
     // Handle drag and drop events
     const handleDragOver = (event) => {
@@ -134,6 +131,10 @@ export default function Job() {
             }
         }
     
+        // Reset preview and file after upload
+        setPreview("Drag & Drop or Click to Upload Audio");
+        setFile(null); // Reset file state
+    
         // Calculate average result
         const averageConfidence = totalConfidence / totalResults;
         const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
@@ -145,12 +146,7 @@ export default function Job() {
             file.id === 0 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
         );
         setFiles(updatedFiles);
-    
-        // Reset file and preview state to allow new uploads
-        setFile(null);
-        setPreview('Drag & Drop or Click to Upload Audio');
     };
-    
     
     const encodeWAV = (samples, sampleRate, numChannels) => {
         const buffer = new ArrayBuffer(44 + samples.length * 2);
