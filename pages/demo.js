@@ -266,26 +266,25 @@ export default function Job() {
                                     </div>
                                 </div>
                                 <div className="col-lg-9">
-                                <div className="contact-form audiolist">
-                                    <div className="job-item-wrap">
-                                    {/* Display all uploaded files */}
-                                    {files.map((file) => (
-                                        <div className="job-item" key={file.id}>
-                                        <Waveform
-                                            key={file.id} // Ensure unique key
-                                            audioUrl={file.url}
-                                            waveColor={file.waveColor}
-                                            progressColor={file.progressColor}
-                                                 size={file.size}
-                                                  filename={file.filename}
-                                                      IsReal={file.isReal}
-                                                     onPlay={() => handlePlay(file.id)}
-                                                     audioId={file.id}
-                                                      handleDelete={() => handleDelete(file.id)}
-                                                  />
-                                             </div>
+                                    <div className="contact-form audiolist">
+                                        <div className="job-item-wrap">
+                                            {/* Display all uploaded files */}
+                                            {files.map((file, index) => (
+                                                <div className="job-item" key={file.id}>
+                                                    <Waveform
+                                                        audioUrl={file.url}
+                                                        waveColor={file.waveColor}
+                                                        progressColor={file.progressColor}
+                                                        size={file.size}
+                                                        filename={file.filename}
+                                                        IsReal={file.isReal}
+                                                        onPlay={() => handlePlay(file.id)}
+                                                        audioId={file.id}
+                                                        handleDelete={() => handleDelete(file.id)} // Pass delete handler
+                                                    />
+                                                </div>
                                             ))}
-                                         </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
