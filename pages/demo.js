@@ -222,26 +222,10 @@ export default function Job() {
                                         <div className="content pb-40">
                                             <a onClick={openFileInput}>Upload File</a>
                                         </div>
+                                        
+                                        
                                         <div className="content pb-40">
-                                            <p>Frame Length 2</p>
-                                            <RangeSlider
-                                                className="single-thumb"
-                                                defaultValue={[0, 50]}
-                                                thumbsDisabled={[true, false]}
-                                                rangeSlideDisabled={true}
-                                            />
-                                        </div>
-                                        <div className="content pb-40">
-                                            <p>Sensitivity 50%</p>
-                                            <RangeSlider
-                                                className="single-thumb"
-                                                defaultValue={[0, 50]}
-                                                thumbsDisabled={[true, false]}
-                                                rangeSlideDisabled={true}
-                                            />
-                                        </div>
-                                        <div className="content pb-40">
-                                            <p>Isolate Voice</p>
+                                            <p>Noise Suppression</p>
                                             <label>
                                                 <Switch onChange={() => handleChange(isChecked)} checked={isChecked} />
                                             </label>
