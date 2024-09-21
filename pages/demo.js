@@ -36,8 +36,7 @@ export default function Job() {
         if (selectedFile) {
             setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview("File Ready to Upload");
-// Display file name instead of image
+            setPreview(selectedFile.name); // Display file name instead of image
 
             // Update files state to include the original file
             const newFile = {
@@ -63,7 +62,7 @@ export default function Job() {
         const selectedFile = event.dataTransfer.files[0];
         if (selectedFile) {
             setFile(selectedFile);
-            setPreview(selectedFile.name); // Show file name instead of image
+            setPreview(selectedFile.name);// Show file name instead of image
 
             // Update files state to include the original file
             const newFile = {
@@ -130,7 +129,7 @@ export default function Job() {
                 if (result.result === 'real') isRealCount++;
             }
         }
-      
+       
 
         // Calculate average result
         const averageConfidence = totalConfidence / totalResults;
@@ -247,7 +246,7 @@ export default function Job() {
                                                 style={{ display: 'none' }}
                                                 id="file-upload"
                                             />
-                                            <span>{file ? file.name : 'Drag & Drop or Click to Upload Audio'}</span>
+                                            <span>{file ? "File Ready to Upload" : 'Drag & Drop or Click to Upload Audio'}</span>
                                         </div>
 
                                         <div className="content pb-40">
