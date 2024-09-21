@@ -16,7 +16,7 @@ export default function Job() {
 
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
-    const [preview, setPreview] = useState("assets/img/voice/upload.png");
+    const [preview, setPreview] = useState("Drag & Drop or Click to Upload Audio");
     const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 }); // Store average result
 
     useEffect(() => {
@@ -36,12 +36,38 @@ export default function Job() {
         if (selectedFile) {
             setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview(objectUrl);
+            setPreview(selectedFile.name); // Display file name instead of image
 
             // Update files state to include the original file
             const newFile = {
                 id: 0, // Use ID 0 for the original file
                 url: objectUrl,
+                waveColor: '#FFFFFF',
+                progressColor: '#FF9900',
+                size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
+                filename: selectedFile.name,
+                isReal: null // Set as null for now since we don't have the result
+            };
+            setFiles([newFile]); // Reset files list with the original file
+        }
+    };
+
+    // Handle drag and drop events
+    const handleDragOver = (event) => {
+        event.preventDefault(); // Allow drop
+    };
+
+    const handleDrop = (event) => {
+        event.preventDefault();
+        const selectedFile = event.dataTransfer.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            setPreview(selectedFile.name); // Show file name instead of image
+
+            // Update files state to include the original file
+            const newFile = {
+                id: 0, // Use ID 0 for the original file
+                url: URL.createObjectURL(selectedFile),
                 waveColor: '#FFFFFF',
                 progressColor: '#FF9900',
                 size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
@@ -197,7 +223,21 @@ export default function Job() {
                             <div className="row">
                                 <div className="col-lg-3">
                                     <div className="responds-wrap uploadarea">
-                                        <div className="icon">
+                                        <div
+                                            className="icon"
+                                            onDragOver={handleDragOver} // Allow dropping
+                                            onDrop={handleDrop} // Handle drop event
+                                            onClick={openFileInput} // Open file dialog on click
+                                            style={{
+                                                width: '100%',
+                                                height: '120px',
+                                                border: '2px dashed #ccc',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
                                             <input
                                                 type="file"
                                                 onChange={handleFileChange}
@@ -205,19 +245,9 @@ export default function Job() {
                                                 style={{ display: 'none' }}
                                                 id="file-upload"
                                             />
-                                            <label htmlFor="file-upload" style={{ cursor: 'pointer' }}>
-                                                (
-                                                    <div style={{ width: '120px', height: '120px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                        <span>Upload Audio</span>
-                                                    </div>
-                                                )
-                                            </label>
+                                            <span>{file ? file.name : 'Drag & Drop or Click to Upload Audio'}</span>
                                         </div>
-                                        <div className="content pb-40">
-                                            <a onClick={openFileInput}>Upload File</a>
-                                        </div>
-                                        
-                                        
+
                                         <div className="content pb-40">
                                             <p>Noise Suppression</p>
                                             <label>
