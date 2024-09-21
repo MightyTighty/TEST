@@ -1,12 +1,15 @@
 import Layout from "@/components/layout/Layout";
 import { useState, useEffect } from 'react';
 import Waveform from "@/components/elements/Waveform";
+import RangeSlider from 'react-range-slider-input';
+import 'react-range-slider-input/dist/style.css';
 import Switch from "react-switch";
 import { useRouter } from 'next/router';
 
 export default function Job() {
     const router = useRouter();
     const [activeIndex, setActiveIndex] = useState(1);
+    const [isImageVisible, setImageVisible] = useState(true);
     const [files, setFiles] = useState([]); // Initially empty, to be populated after upload
     const [isChecked, setIsChecked] = useState(true);
     const [currentPlaying, setCurrentPlaying] = useState(null);
@@ -14,7 +17,7 @@ export default function Job() {
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("Drag & Drop or Click to Upload Audio");
-    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 });
+    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 }); // Store average result
 
     useEffect(() => {
         const tok = localStorage.getItem("token");
@@ -33,7 +36,7 @@ export default function Job() {
         if (selectedFile) {
             setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview("File ready for upload"); // Update to a simple message instead of file name
+            setPreview(selectedFile.name); // Display file name instead of image
 
             // Update files state to include the original file
             const newFile = {
@@ -59,7 +62,7 @@ export default function Job() {
         const selectedFile = event.dataTransfer.files[0];
         if (selectedFile) {
             setFile(selectedFile);
-            setPreview("File ready for upload"); // Update to a simple message
+            setPreview(selectedFile.name); // Show file name instead of image
 
             // Update files state to include the original file
             const newFile = {
@@ -73,6 +76,25 @@ export default function Job() {
             };
             setFiles([newFile]); // Reset files list with the original file
         }
+    };
+
+    // Function to upload chunks of the audio file
+    const uploadChunk = async (chunk, index) => {
+        const formData = new FormData();
+        const audioFile = new File([chunk], `chunk-${index}.wav`, { type: 'audio/wav' });
+        formData.append('file', audioFile);
+
+        let token = localStorage.getItem("token");
+
+        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        return response.json();
     };
 
     // Function to handle file upload and chunking
@@ -202,10 +224,19 @@ export default function Job() {
                                 <div className="col-lg-3">
                                     <div className="responds-wrap uploadarea">
                                         <div
-                                            className="drag-and-drop-box" // Apply theme class here
+                                            className="icon"
                                             onDragOver={handleDragOver} // Allow dropping
                                             onDrop={handleDrop} // Handle drop event
                                             onClick={openFileInput} // Open file dialog on click
+                                            style={{
+                                                width: '100%',
+                                                height: '120px',
+                                                border: '2px dashed #ccc',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                cursor: 'pointer'
+                                            }}
                                         >
                                             <input
                                                 type="file"
@@ -214,7 +245,7 @@ export default function Job() {
                                                 style={{ display: 'none' }}
                                                 id="file-upload"
                                             />
-                                            <span>{preview}</span> {/* Show the upload message here */}
+                                            <span>{file ? file.name : 'Drag & Drop or Click to Upload Audio'}</span>
                                         </div>
 
                                         <div className="content pb-40">
