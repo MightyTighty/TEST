@@ -130,6 +130,7 @@ export default function Job() {
             }
         }
         setPreview("File Uploaded"); // <-- Add this line here
+        setFile(null);
 
 
         // Calculate average result
@@ -265,11 +266,7 @@ export default function Job() {
                                             <div className="content pb-40">
                                                 <p>Average Result: {averageResult.result}</p>
                                                 <p>Average Confidence: {averageResult.confidence.toFixed(2)}</p>
-                                                {averageResult.confidence > 0.5 ? (
-                                                    <img src="/path/to/real_image.png" alt="Real" style={{ width: '120px' }} />
-                                                ) : (
-                                                    <img src="/path/to/fake_image.png" alt="Fake" style={{ width: '120px' }} />
-                                                )}
+                                                
                                             </div>
                                         )}
                                     </div>
