@@ -53,7 +53,7 @@ export default function HowItWorks() {
                     </div>
                 </div>
             </section>
-            <ContactForm /> {/* Include the ContactForm component here */}
+
         </>
     );
 }
