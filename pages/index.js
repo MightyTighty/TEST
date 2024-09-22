@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout"
 import Banner1 from "@/components/sections/Banner1"
+import ContactForm from "@/components/sections/ContactForm"
 import Counter1 from "@/components/sections/Counter1"
 import Demo from "@/components/sections/Demo"
 import HowItWorks from "@/components/sections/HowItWorks"
@@ -23,6 +24,7 @@ export default function Home1() {
               {/*  <UseCases />*/}
                  <HowItWorks />
                 <Pricing1 />
+                <ContactForm/>
                {/*  <Tools />*/}
                {/* <Testimonial1 />*/}
  
