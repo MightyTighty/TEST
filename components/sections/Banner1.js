@@ -10,7 +10,8 @@ export default function Banner1() {
                         <div className="col-lg-12">
                             <div className="banner-content ta-animated-headline">
                                 <h2 className="title ah-headline wow fadeInUp" data-wow-delay=".2s">
-                                    <span>Redefining Digital Forensics with </span>
+                                    <span>Redefining Digital Forensics with</span>
+                                    <br /> {/* This will move the changing words to the new line */}
                                     <Typewriter tag="span"
                                         options={{
                                             wrapperClassName: "ah-words-wrapper",
@@ -21,14 +22,14 @@ export default function Banner1() {
                                     />
                                 </h2>
                                 <h2 className="title d-none wow fadeInUp" data-wow-delay=".2s">
-                                    Redefining Digital Forensics with <span>Advanced AI,</span> <span>Innovation,</span> <span>Integrity</span>
+                                    Redefining Digital Forensics with <br /> <span>Advanced AI,</span> <span>Innovation,</span> <span>Integrity</span>
                                 </h2>
                                 <p className="wow fadeInUp" data-wow-delay=".4s">
                                     We deliver groundbreaking AI solutions for deepfake detection and digital forensics, setting new standards in the industry. As a promising startup, we are on a mission to become your trusted partner in digital security, driving innovation with precision and reliability.
                                 </p>
                                 <div className="banner-btn">
                                     <Link href="/demo" className="gradient-btn wow fadeInLeft" data-wow-delay=".6s">Start a Free Trial</Link>
-                                    <Link href="/work" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">Learn How It Works</Link>
+                                    <Link href="/work" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">Learn More</Link>
                                 </div>
                             </div>
                         </div>

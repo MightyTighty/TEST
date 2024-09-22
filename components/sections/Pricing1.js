@@ -92,7 +92,7 @@ export default function Pricing1() {
                                             </div>
                                         </div>
                                         <div className="pricing-price">
-                                            <h2 className="title monthly_price">${isToggled ? "299" : "39"}</h2>
+                                            <h2 className="title monthly_price">${isToggled ? "950$" : "99$"}</h2>
                                             {/* <h2 className="title annual_price">$299</h2> */}
                                         </div>
                                     </div>
@@ -131,7 +131,7 @@ export default function Pricing1() {
                                             </div>
                                         </div>
                                         <div className="pricing-price">
-                                            <h2 className="title monthly_price">${isToggled ? "699" : "99"}</h2>
+                                            <h2 className="title monthly_price">${isToggled ? "4800$" : "499$"}</h2>
                                         </div>
                                     </div>
                                     <div className="pricing-list">
