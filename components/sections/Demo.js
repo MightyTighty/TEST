@@ -42,9 +42,15 @@ export default function Demo() {
     const [currentPlaying, setCurrentPlaying] = useState(null);
     
     const handleOnClick = (index) => {
-        setActiveIndex(index)
+        // Stop the currently playing audio if there is one
+        if (currentPlaying) {
+            document.querySelector(`button[data-id="${currentPlaying}"]`).click();
+        }
 
+        // Set the new active index
+        setActiveIndex(index);
     }
+
     const handlePlay = (id) => {
         if (currentPlaying && currentPlaying !== id) {
           document.querySelector(`button[data-id="${currentPlaying}"]`).click();
@@ -88,6 +94,7 @@ export default function Demo() {
                                                         IsReal={audioFiles[0].isReal}
                                                         forHome={audioFiles[0].forHome}
                                                         audioId={audioFiles[0].id}
+                                                        onPlay={() => handlePlay(audioFiles[0].id)} // Attach the play handler
                                                     />
                                                     </div>
                                                     </div>
@@ -105,6 +112,7 @@ export default function Demo() {
                                                         IsReal={audioFiles[1].isReal}
                                                         forHome={audioFiles[1].forHome}
                                                         audioId={audioFiles[1].id}
+                                                        onPlay={() => handlePlay(audioFiles[1].id)} // Attach the play handler
                                                     />
                                                     </div>
                                                     </div>
@@ -123,6 +131,7 @@ export default function Demo() {
                                                         IsReal={audioFiles[2].isReal}
                                                         forHome={audioFiles[2].forHome}
                                                         audioId={audioFiles[2].id}
+                                                        onPlay={() => handlePlay(audioFiles[2].id)} // Attach the play handler
                                                     />
                                         </div>
                                         </div>
