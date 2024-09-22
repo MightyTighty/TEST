@@ -27,8 +27,7 @@ export default function HowItWorks() {
                                             </div>
                                             <div className="content">
                                                 <h2 className="title">Effortless Installation</h2>
-                                                <p>Our deployment process is simplified with a guided installation, allowing you to set up securely in your environment.
-                                                     Configure everything offline without the need for external access.</p>
+                                                <p>Deploying our solution is simple and secure with a step-by-step installation guide. Configure everything in your environment offline, ensuring a smooth setup process without any need for external network access.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -39,8 +38,7 @@ export default function HowItWorks() {
                                             </div>
                                             <div className="content">
                                                 <h2 className="title">Secure and Self-Contained</h2>
-                                                <p>Run all processes within your isolated infrastructure.
-                                                    With no need for internet connectivity, our air-gapped setup guarantees that your data stays protected and inaccessible from the outside world.</p>
+                                                <p>Operate all processes within your isolated infrastructure. With no internet connectivity required, our air-gapped deployment keeps your data fully protected and inaccessible to external threats, maintaining maximum security.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -51,8 +49,9 @@ export default function HowItWorks() {
                                             </div>
                                             <div className="content">
                                                 <h2 className="title">Scalable Licensing</h2>
-                                                <p>Select the licensing plan that suits your organization, whether for a single site or multiple locations.
-                                                     Easily adjust your subscription as your security needs evolve, all while ensuring compliance with GDPR and other data protection regulations, without requiring internet connectivity.</p>
+                                                <p>Choose a licensing plan tailored to your needs, from single-site deployments to multi-location setups. Adapt your subscription as your security requirements change, all while adhering to GDPR and other data regulations—no internet needed.
+
+</p>
                                            
                                             </div>
                                         </div>
