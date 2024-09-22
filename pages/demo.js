@@ -8,16 +8,12 @@ import { useRouter } from 'next/router';
 
 export default function Job() {
     const router = useRouter();
-    const [activeIndex, setActiveIndex] = useState(1);
-    const [isImageVisible, setImageVisible] = useState(true);
-    const [files, setFiles] = useState([]); // Keep all files in an array
+    const [files, setFiles] = useState([]);
     const [isChecked, setIsChecked] = useState(true);
     const [currentPlaying, setCurrentPlaying] = useState(null);
-
     const [token, setToken] = useState("");
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("Drag & Drop or Click to Upload Audio");
-    const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 });
 
     useEffect(() => {
         const tok = localStorage.getItem("token");
@@ -27,81 +23,25 @@ export default function Job() {
     }, []);
 
     const handleFileChange = (event) => {
-        const tok = localStorage.getItem("token");
-        if (!tok) {
-            router.push("/login");
-        }
-
         const selectedFile = event.target.files[0];
         if (selectedFile) {
-            setFile(selectedFile);
             const objectUrl = URL.createObjectURL(selectedFile);
-            setPreview("File Ready to Upload");
 
-            // Add the new file to the list of files
+            // Create a new file object and append to the state
             const newFile = {
-                id: files.length, // Use length as ID for new files
+                id: files.length, // Unique ID based on current length
                 url: objectUrl,
                 waveColor: '#FFFFFF',
                 progressColor: '#FF9900',
                 size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
                 filename: selectedFile.name,
-                isReal: null // Set as null for now since we don't have the result
+                isReal: null // Initial result state
             };
-            setFiles([...files, newFile]); // Append new file to previous files
-        }
-    };
-    
-      // Handle drag and drop events
-    const handleDragOver = (event) => {
-        event.preventDefault(); // Allow drop
-    };
-
-
-
-    const handleDrop = (event) => {
-        event.preventDefault();
-        const selectedFile = event.dataTransfer.files[0];
-        if (selectedFile) {
-            setFile(selectedFile);
+            setFiles([...files, newFile]);
             setPreview("File Ready to Upload");
-
-            // Add the new file to the list of files
-            const newFile = {
-                id: files.length, // Use length as ID for new files
-                url: URL.createObjectURL(selectedFile),
-                waveColor: '#FFFFFF',
-                progressColor: '#FF9900',
-                size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
-                filename: selectedFile.name,
-                isReal: null // Set as null for now since we don't have the result
-            };
-            setFiles([...files, newFile]); // Append new file to previous files
         }
     };
 
-    
-
-    // Function to upload chunks of the audio file
-    const uploadChunk = async (chunk, index) => {
-        const formData = new FormData();
-        const audioFile = new File([chunk], `chunk-${index}.wav`, { type: 'audio/wav' });
-        formData.append('file', audioFile);
-
-        let token = localStorage.getItem("token");
-
-        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
-            body: formData
-        });
-
-        return response.json();
-    };
-
-    // Function to handle file upload and chunking
     const handleUpload = async () => {
         if (!file) return;
     
@@ -142,15 +82,27 @@ export default function Job() {
         const averageConfidence = totalConfidence / totalResults;
         const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
     
-        setAverageResult({ result: majorityResult, confidence: averageConfidence });
-    
-        // Update the original file result in files state with average result
-        const updatedFiles = files.map(file =>
-            file.id === 0 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
+        // Update the state of the specific file with the upload result
+        setFiles((prevFiles) =>
+            prevFiles.map((f) =>
+                f.id === files.length - 1 // Update only the last uploaded file
+                    ? { ...f, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' }
+                    : f
+            )
         );
-        setFiles(updatedFiles);
     };
-    
+
+    const handleDelete = (id) => {
+        setFiles(files.filter(file => file.id !== id));
+    };
+
+    const handlePlay = (id) => {
+        if (currentPlaying && currentPlaying !== id) {
+            document.querySelector(`button[data-id="${currentPlaying}"]`).click();
+        }
+        setCurrentPlaying(id);
+    };
+
     const encodeWAV = (samples, sampleRate, numChannels) => {
         const buffer = new ArrayBuffer(44 + samples.length * 2);
         const view = new DataView(buffer);
@@ -198,30 +150,6 @@ export default function Job() {
         return buffer;
     };
 
-    const handleOnClick = (index) => {
-        setActiveIndex(index);
-    };
-
-    const handleChange = (checked) => {
-        setIsChecked(!checked);
-    };
-
-    const openFileInput = () => {
-        document.getElementById('file-upload').click();
-    };
-
-    const handlePlay = (id) => {
-        if (currentPlaying && currentPlaying !== id) {
-            document.querySelector(`button[data-id="${currentPlaying}"]`).click();
-        }
-        setCurrentPlaying(id);
-    };
-
-    const handleDelete = (id) => {
-        // Filter out the file with the specified ID from the files list
-        setFiles(files.filter(file => file.id !== id));
-    };
-
     return (
         <>
             <Layout headerStyle={1} footerStyle={1} breadcrumbTitle={<>Try a <span>Demo</span></>}>
@@ -233,9 +161,9 @@ export default function Job() {
                                     <div className="responds-wrap uploadarea">
                                         <div
                                             className="contact-form audiolist"
-                                            onDragOver={handleDragOver} // Allow dropping
+                                            onDragOver={(e) => e.preventDefault()}
                                             onDrop={handleDrop} // Handle drop event
-                                            onClick={() => document.getElementById('file-upload').click()} // Open file dialog on click
+                                            onClick={() => document.getElementById('file-upload').click()}
                                         >
                                             <input
                                                 type="file"
@@ -257,21 +185,16 @@ export default function Job() {
                                                 <button onClick={handleUpload} className="btn btn-two">Upload</button>
                                             </div>
                                         </div>
-                                        {averageResult.result && (
-                                            <div className="content pb-40">
-                                                <p>Average Result: {averageResult.result}</p>
-                                                <p>Average Confidence: {averageResult.confidence.toFixed(2)}</p>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                                 <div className="col-lg-9">
                                     <div className="contact-form audiolist">
                                         <div className="job-item-wrap">
-                                            {/* Display all uploaded files */}
-                                            {files.map((file, index) => (
+                                            {/* Render all uploaded files */}
+                                            {files.map((file) => (
                                                 <div className="job-item" key={file.id}>
                                                     <Waveform
+                                                        key={file.id}
                                                         audioUrl={file.url}
                                                         waveColor={file.waveColor}
                                                         progressColor={file.progressColor}
@@ -280,7 +203,7 @@ export default function Job() {
                                                         IsReal={file.isReal}
                                                         onPlay={() => handlePlay(file.id)}
                                                         audioId={file.id}
-                                                        handleDelete={() => handleDelete(file.id)} // Pass delete handler
+                                                        handleDelete={() => handleDelete(file.id)}
                                                     />
                                                 </div>
                                             ))}
