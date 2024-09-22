@@ -26,12 +26,9 @@ export default function HowItWorks() {
                                             <i className="far fa-chart-line"></i>
                                             </div>
                                             <div className="content">
-                                                <h2 className="title">Easy Installation</h2>
-                                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                                                     Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                                      when an unknown printer took a galley of type and scrambled it to make a type
-                                                       specimen book. It has survived not only five centuries, but also the leap into
-                                                        electronic typesetting, remaining essentially unchanged.</p>
+                                                <h2 className="title">Effortless Installation</h2>
+                                                <p>Our deployment process is simplified with a guided installation, allowing you to set up securely in your environment.
+                                                     Configure everything offline without the need for external access.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -42,11 +39,8 @@ export default function HowItWorks() {
                                             </div>
                                             <div className="content">
                                                 <h2 className="title">Secure and Self-Contained</h2>
-                                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                                                     Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                                      when an unknown printer took a galley of type and scrambled it to make a type
-                                                       specimen book. It has survived not only five centuries, but also the leap into
-                                                        electronic typesetting, remaining essentially unchanged.</p>
+                                                <p>Run all processes within your isolated infrastructure.
+                                                    With no need for internet connectivity, our air-gapped setup guarantees that your data stays protected and inaccessible from the outside world.</p>
                                             </div>
                                         </div>
                                     </div>
@@ -56,12 +50,9 @@ export default function HowItWorks() {
                                                 <i className="far fa-chart-line" />
                                             </div>
                                             <div className="content">
-                                                <h2 className="title">Flexible Licensing</h2>
-                                                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                                                     Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-                                                      when an unknown printer took a galley of type and scrambled it to make a type
-                                                       specimen book. It has survived not only five centuries, but also the leap into
-                                                        electronic typesetting, remaining essentially unchanged.</p>
+                                                <h2 className="title">Scalable Licensing</h2>
+                                                <p>Select the licensing plan that suits your organization, whether for a single site or multiple locations.
+                                                     Easily adjust your subscription as your security needs evolve, all while ensuring compliance with GDPR and other data protection regulations, without requiring internet connectivity.</p>
                                            
                                             </div>
                                         </div>
