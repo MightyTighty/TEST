@@ -44,7 +44,7 @@ export default function Pricing1() {
                                         </div>
                                         <div className="pricing-price">
                                             <h2 className="title monthly_price">$20</h2>
-                                            <h2 className="title annual_price">$240</h2> {/* Annual pricing */}
+                                            <h2 className="title annual_price">$200</h2> {/* Annual pricing */}
                                         </div>
                                     </div>
                                     <div className="pricing-list">
@@ -95,6 +95,7 @@ export default function Pricing1() {
                                         </div>
                                         <div className="pricing-price">
                                             <h2 className="title monthly_price">$99</h2>
+                                            <h2 className="title annual_price">$950</h2>
                                         </div>
                                     </div>
                                     <div className="pricing-list">
@@ -132,6 +133,7 @@ export default function Pricing1() {
                                         </div>
                                         <div className="pricing-price">
                                             <h2 className="title monthly_price">$499</h2>
+                                            <h2 className="title annual_price">$4800</h2>
                                         </div>
                                     </div>
                                     <div className="pricing-list">
