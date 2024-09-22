@@ -12,7 +12,8 @@ const Waveform = ({
   forHome, 
   onPlay, 
   audioId, 
-  handleDelete  // Add handleDelete prop here
+  handleDelete,  // Add handleDelete prop here
+  registerWaveSurfer // Register the WaveSurfer instance
 }) => {
   const waveformRef = useRef(null);
   const wavesurferRef = useRef(null);
@@ -26,7 +27,6 @@ const Waveform = ({
       progressColor: progressColor || '#ADFF2F',
       url: audioUrl,
       dragToSeek: true,
-      width: '100%',
       hideScrollbar: true,
       normalize: true,
       barGap: 1,
@@ -36,9 +36,14 @@ const Waveform = ({
       barWidth: size.barWidth || 3,
     });
 
+    // Register the WaveSurfer instance
+    if (registerWaveSurfer) {
+      registerWaveSurfer(audioId, wavesurferRef.current);
+    }
+
     // Cleanup on component unmount
     return () => wavesurferRef.current?.destroy();
-  }, [audioUrl, waveColor, progressColor, size]);
+  }, [audioUrl, waveColor, progressColor, size, audioId, registerWaveSurfer]);
 
   const togglePlayPause = () => {
     if (wavesurferRef.current) {
@@ -79,9 +84,7 @@ const Waveform = ({
           src={forHome ? "" : "/assets/img/voice/reportIcon.png"}  
           style={{ width: '30px', height: 'auto', margin: '10px 10px' }}
         />
-      <span className={IsReal === null ? "neutralspan" : (IsReal ? "realspan" : "fakespan")}>
-        {!forHome ? (IsReal === null ? "Processing" : (IsReal ? "Real" : "Fake")) : ""}
-</span>
+        <span className={IsReal ? "realspan" : "fakespan"}>{!forHome ? (IsReal ? "Real" : "Fake") : ""}</span>
         <img 
           src={forHome ? "" : "/assets/img/voice/deleteicon.png"}  
           alt="Delete"
