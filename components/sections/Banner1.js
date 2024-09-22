@@ -1,6 +1,5 @@
-import Link from "next/link"
-import Typewriter from 'typewriter-effect'
-
+import Link from "next/link";
+import Typewriter from 'typewriter-effect';
 
 export default function Banner1() {
     return (
@@ -11,28 +10,29 @@ export default function Banner1() {
                         <div className="col-lg-12">
                             <div className="banner-content ta-animated-headline">
                                 <h2 className="title ah-headline wow fadeInUp" data-wow-delay=".2s">
-                                    <span>Whatever You want to ask- DEX.AI has the </span>
+                                    <span>Raid.ai: Your Partner in </span>
                                     <Typewriter tag="span"
                                         options={{
                                             wrapperClassName: "ah-words-wrapper",
-                                            strings: ['Answers', 'Solutions'],
+                                            strings: ['Security', 'Innovation', 'Forensics'],
                                             autoStart: true,
                                             loop: true,
                                         }}
                                     />
                                 </h2>
-                                <h2 className="title d-none wow fadeInUp" data-wow-delay=".2s">Whatever You want to ask- DEX.AI has the <span>Answers,</span> <span>Solutions</span></h2>
-                                <p className="wow fadeInUp" data-wow-delay=".4s">Artificial intelligence makes it fast  easy to create content for your blog, social media, website, and more! Rated 5/5 stars in 3,000+ reviews.</p>
+                                <h2 className="title d-none wow fadeInUp" data-wow-delay=".2s">Raid.ai: Your Partner in <span>Security,</span> <span>Innovation,</span> <span>Forensics</span></h2>
+                                <p className="wow fadeInUp" data-wow-delay=".4s">
+    We deliver groundbreaking AI solutions for deepfake detection and digital forensics, setting new standards in the industry. As a promising startup, RAID.ai is on a mission to become a trusted ally in digital security, poised for growth and innovation.
+</p>
                                 <div className="banner-btn">
-                                    <Link href="/demo" className="gradient-btn wow fadeInLeft" data-wow-delay=".6s">start a free trial</Link>
-                                    <Link href="/work" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">how it works</Link>
+                                    <Link href="/demo" className="gradient-btn wow fadeInLeft" data-wow-delay=".6s">Start a Free Trial</Link>
+                                    <Link href="/work" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">Learn How It Works</Link>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
-
         </>
-    )
+    );
 }
