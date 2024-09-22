@@ -14,7 +14,7 @@ export default function Counter1() {
                         </div>
                         <div className="col-lg-4 col-md-6">
                             <div className="counter-item">
-                                <h2 className="count">$40 Billion USD</h2>
+                                <h2 className="count">$40 Billion</h2>
                                 <p>Financial Exposure</p>
                             </div>
                         </div>
