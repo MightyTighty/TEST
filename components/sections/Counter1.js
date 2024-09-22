@@ -8,20 +8,20 @@ export default function Counter1() {
                     <div className="row justify-content-center">
                         <div className="col-lg-4 col-md-6">
                             <div className="counter-item">
-                                <h2 className="count">3DAYS</h2>
-                                <p>Average Saved / Week</p>
+                                <h2 className="count">400 / Day</h2>
+                                <p>Fraud Incidents</p>
                             </div>
                         </div>
                         <div className="col-lg-4 col-md-6">
                             <div className="counter-item">
-                                <h2 className="count">$400000</h2>
-                                <p>Trained AI Model</p>
+                                <h2 className="count">$40 Billion USD</h2>
+                                <p>Financial Exposure</p>
                             </div>
                         </div>
                         <div className="col-lg-4 col-md-6">
                             <div className="counter-item">
-                                <h2 className="count">480+</h2>
-                                <p>Powerful AI Business Tools</p>
+                                <h2 className="count">50000+</h2>
+                                <p> Fraud Alerts Sent</p>
                             </div>
                         </div>
                     </div>
