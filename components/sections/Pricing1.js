@@ -1,12 +1,13 @@
-import Link from "next/link";
-import { useState } from "react";
+import Link from "next/link"
+import { useState } from "react"
 
 export default function Pricing1() {
-    const [isToggled, setToggled] = useState(false);
-    const toggleTrueFalse = () => setToggled(!isToggled);
+
+    const [isToggled, setToggled] = useState(false)
+    const toggleTrueFalse = () => setToggled(!isToggled)
     return (
         <>
-            <section className="pricing-area pb-110" id="Pricing">
+            <section className="pricing-area pb-110" id="Pricing" >
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12">
@@ -19,12 +20,11 @@ export default function Pricing1() {
                         <div className="pricing-billing-duration text-center">
                             <div className="pricing-tab" onClick={toggleTrueFalse}>
                                 <span className="tab-btn monthly_tab_title">Monthly</span>
-                                <span className={isToggled ? "pricing-tab-switcher active" : "pricing-tab-switcher"} />
+                                <span className={isToggled ? "pricing-tab-switcher active" : " pricing-tab-switcher"} />
                                 <span className="tab-btn annual_tab_title">Yearly</span>
                             </div>
                         </div>
                         <div className="row justify-content-center">
-                            {/* Basic Plan */}
                             <div className="col-xl-4 col-lg-6 col-md-9 col-sm-10">
                                 <div className="pricing-item wow fadeInLeft" data-wow-delay=".2s">
                                     <div className="pricing-shape">
@@ -39,17 +39,16 @@ export default function Pricing1() {
                                             </div>
                                             <div className="content">
                                                 <h4 className="title">Basic</h4>
-                                                <span>03 Services</span>
+                                                <span>Personal Use</span>
                                             </div>
                                         </div>
                                         <div className="pricing-price">
-                                            <h2 className="title monthly_price">$20</h2>
-                                            <h2 className="title annual_price">$200</h2> {/* Annual pricing */}
+                                        <h2 className="title monthly_price">${isToggled ? "200$" : "20$"}</h2>
                                         </div>
                                     </div>
                                     <div className="pricing-list">
                                         <ul className="list-wrap">
-                                            <li>30,000 seconds/month</li>
+                                        <li>30,000 seconds/month</li>
                                             <li>1 Language for fake detection</li>
                                             <li>Basic Summary Reports</li>
                                             <li className="delete">API access</li>
@@ -65,7 +64,6 @@ export default function Pricing1() {
                                     </div>
                                 </div>
                             </div>
-                            {/* Professional Plan */}
                             <div className="col-xl-4 col-lg-6 col-md-9 col-sm-10">
                                 <div className="pricing-item active wow fadeInUp" data-wow-delay=".5s">
                                     <span className="popular">Most popular</span>
@@ -90,12 +88,12 @@ export default function Pricing1() {
                                             </div>
                                             <div className="content">
                                                 <h4 className="title">Professional</h4>
-                                                <span>05 Services</span>
+                                                <span>Pro Users</span>
                                             </div>
                                         </div>
                                         <div className="pricing-price">
-                                            <h2 className="title monthly_price">$99</h2>
-                                            <h2 className="title annual_price">$950</h2>
+                                            <h2 className="title monthly_price">${isToggled ? "299" : "39"}</h2>
+                                            {/* <h2 className="title annual_price">$299</h2> */}
                                         </div>
                                     </div>
                                     <div className="pricing-list">
@@ -106,6 +104,8 @@ export default function Pricing1() {
                                             <li>API access</li>
                                             <li>Advanced Analytics Dashboard</li>
                                             <li>Priority Support</li>
+                                            <li className="delete">Custom Analytics Dashboard</li>
+                                            <li className="delete">New experimental features</li>
                                         </ul>
                                     </div>
                                     <div className="pricing-btn">
@@ -113,7 +113,6 @@ export default function Pricing1() {
                                     </div>
                                 </div>
                             </div>
-                            {/* Business Plan */}
                             <div className="col-xl-4 col-lg-6 col-md-9 col-sm-10">
                                 <div className="pricing-item wow fadeInRight" data-wow-delay=".2s">
                                     <div className="pricing-shape">
@@ -128,12 +127,11 @@ export default function Pricing1() {
                                             </div>
                                             <div className="content">
                                                 <h4 className="title">Business</h4>
-                                                <span>07 Services</span>
+                                                <span>Enterprise</span>
                                             </div>
                                         </div>
                                         <div className="pricing-price">
-                                            <h2 className="title monthly_price">$499</h2>
-                                            <h2 className="title annual_price">$4800</h2>
+                                            <h2 className="title monthly_price">${isToggled ? "699" : "99"}</h2>
                                         </div>
                                     </div>
                                     <div className="pricing-list">
@@ -145,7 +143,8 @@ export default function Pricing1() {
                                             <li>Custom Model Training</li>
                                             <li>Custom Analytics Dashboard</li>
                                             <li>Top-priority Support</li>
-                                        </ul>
+                                            </ul>
+
                                     </div>
                                     <div className="pricing-btn">
                                         <Link href="/login" className="btn btn-two">choose plan</Link>
@@ -156,6 +155,7 @@ export default function Pricing1() {
                     </div>
                 </div>
             </section>
+
         </>
-    );
+    )
 }
