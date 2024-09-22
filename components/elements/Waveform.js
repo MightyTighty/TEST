@@ -79,7 +79,9 @@ const Waveform = ({
           src={forHome ? "" : "/assets/img/voice/reportIcon.png"}  
           style={{ width: '30px', height: 'auto', margin: '10px 10px' }}
         />
-        <span className={IsReal ? "realspan" : "fakespan"}>{!forHome ? (IsReal ? "Real" : "Fake") : ""}</span>
+      <span className={IsReal === null ? "neutralspan" : (IsReal ? "realspan" : "fakespan")}>
+        {!forHome ? (IsReal === null ? "Processing..." : (IsReal ? "Real" : "Fake")) : ""}
+</span>
         <img 
           src={forHome ? "" : "/assets/img/voice/deleteicon.png"}  
           alt="Delete"
