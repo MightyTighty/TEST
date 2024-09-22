@@ -6,7 +6,7 @@ import Waveform from "@/components/elements/Waveform"
 const audioFiles = [
     {
         id:1,
-        url: '/assets/audio/sampleaudio.mp3',
+        url: '/assets/audio/kamala-fake.mp3',
         waveColor: '#FFFFFF',
         progressColor: 'red',
         size: { height: 100, barHeight: 20, barRadius: 2, barWidth: 3 },
@@ -16,7 +16,7 @@ const audioFiles = [
     },
     {
         id:2,
-        url: '/assets/audio/sampleaudio.mp3',
+        url: '/assets/audio/t2s.mp3',
         waveColor: '#FFFFFF',
         progressColor: 'green',
         size: { height: 100, barHeight: 20, barRadius: 2, barWidth: 3 },
@@ -26,7 +26,7 @@ const audioFiles = [
     },
     {
         id:3,
-        url: '/assets/audio/sampleaudio.mp3',
+        url: '/assets/audio/s2s.mp3',
         waveColor: '#FFFFFF',
         progressColor: 'red',
         size: { height: 100, barHeight: 20, barRadius: 2, barWidth: 2 },

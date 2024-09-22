@@ -29,7 +29,7 @@ export default function Banner1() {
                                 </p>
                                 <div className="banner-btn">
                                     <Link href="/demo" className="gradient-btn wow fadeInLeft" data-wow-delay=".6s">Start a Free Trial</Link>
-                                    <Link href="/work" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">Learn More</Link>
+                                    <Link href="/work" className="gradient-btn gradient-btn-two wow fadeInRight" data-wow-delay=".6s">How It Works</Link>
                                 </div>
                             </div>
                         </div>
