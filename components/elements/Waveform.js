@@ -71,24 +71,26 @@ const Waveform = ({
         <div ref={waveformRef}></div>
       </div>
 
-      <div 
-        onClick={togglePlayPause} 
-        style={{ display: forHome ? 'none' : 'flex', alignItems: 'center', marginTop: '0px 10px', border: 'none', background: 'none' }}
-      >
-        <img 
-          src={forHome ? "" : "/assets/img/voice/reportIcon.png"}  
-          style={{ width: '30px', height: 'auto', margin: '10px 10px' }}
-        />
-      <span className={IsReal === null ? "neutralspan" : (IsReal ? "realspan" : "fakespan")}>
-        {!forHome ? (IsReal === null ? "Processing..." : (IsReal ? "Real" : "Fake")) : ""}
-</span>
-        <img 
-          src={forHome ? "" : "/assets/img/voice/deleteicon.png"}  
-          alt="Delete"
-          onClick={() => handleDelete(audioId)} // Attach the handleDelete function here
-          style={{ width: '30px', height: 'auto', margin: '10px 10px', cursor: 'pointer' }} // Add cursor pointer for better UX
-        />
-      </div>
+      {/* Show the Real/Fake status and report icon only if IsReal is not null */}
+      {IsReal !== null && (
+        <div 
+          style={{ display: forHome ? 'none' : 'flex', alignItems: 'center', marginTop: '0px 10px', border: 'none', background: 'none' }}
+        >
+          <img 
+            src={forHome ? "" : "/assets/img/voice/reportIcon.png"}  
+            style={{ width: '30px', height: 'auto', margin: '10px 10px' }}
+          />
+          <span className={IsReal ? "realspan" : "fakespan"}>
+            {!forHome ? (IsReal ? "Real" : "Fake") : ""}
+          </span>
+          <img 
+            src={forHome ? "" : "/assets/img/voice/deleteicon.png"}  
+            alt="Delete"
+            onClick={() => handleDelete(audioId)} // Attach the handleDelete function here
+            style={{ width: '30px', height: 'auto', margin: '10px 10px', cursor: 'pointer' }} // Add cursor pointer for better UX
+          />
+        </div>
+      )}
     </div>
   );
 };
