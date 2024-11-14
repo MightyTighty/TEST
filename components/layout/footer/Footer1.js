@@ -53,18 +53,7 @@ export default function Footer1() {
                         <div className="footer-top">
                             <div className="row">
                                 <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6">
-                                    <div className="footer-widget">
-                                        <h4 className="fw-title">Use Case</h4>
-                                        <div className="footer-link">
-                                            <ul className="list-wrap">
-                                                <li><Link href="/contact">For teams</Link></li>
-                                                <li><Link href="/contact">For blog writer</Link></li>
-                                                <li><Link href="/contact">For social media</Link></li>
-                                                <li><Link href="/contact">Report  Outage</Link></li>
-                                                <li><Link href="/contact">Email Marketing</Link></li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                   
                                 </div>
                                 <div className="col-xl-2 col-lg-3 col-md-4 col-sm-6">
                                     <div className="footer-widget">
@@ -85,7 +74,7 @@ export default function Footer1() {
                                         <h4 className="fw-title">Product</h4>
                                         <div className="footer-link">
                                             <ul className="list-wrap">
-                                                <li><Link href="/">DEX. AI</Link></li>
+                                                <li><Link href="/">Raid AI</Link></li>
                                                 <li><Link href="/work">Our work</Link></li>
                                                 <li><Link href="/about">About us</Link></li>
                                                 <li><Link href="/help">Support</Link></li>
@@ -98,9 +87,9 @@ export default function Footer1() {
                                     <div className="footer-widget">
                                         <h4 className="fw-title">Need help?</h4>
                                         <div className="footer-contact">
-                                            <Link href="tel:0123456789" className="phone">+(1) 123 656 7866</Link>
-                                            <Link href="mailto:dex.aiinfotive@.com" className="email">dex.ai infotive@.com</Link>
-                                            <Link href="mailto:dex.aiinfotive@.com" className="email">webdexai.com</Link>
+                                            
+                                            <Link href="mailto:info@raidai.net" className="email">info@raidai.net</Link>
+                                            <Link href="mailto:info@raidai.net" className="email">raidai.net</Link>
                                         </div>
                                         <div className="footer-social">
                                             <ul className="list-wrap">
@@ -127,7 +116,7 @@ export default function Footer1() {
                             <div className="row align-items-center">
                                 <div className="col-lg-8">
                                     <div className="copyright-text">
-                                        <p>Copyright © {new Date().getFullYear()} DEX.AI All rights reserved.</p>
+                                        <p>Copyright © {new Date().getFullYear()} Raid AI All rights reserved.</p>
                                     </div>
                                 </div>
                                 <div className="col-lg-4">

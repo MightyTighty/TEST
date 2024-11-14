@@ -92,7 +92,7 @@ export default function Login() {
                                         <div className="password-wrap">
                                             <button type="reset">Forgot Password</button>
                                         </div>
-                                        <button type="submit" className="sine-btn">sing in</button>
+                                        <button type="submit" className="sine-btn">Sign In</button>
                                    
                                         <span>Don’t have an account? <a href="/signup">Sign up for free</a></span>
                                     </form>
@@ -103,7 +103,7 @@ export default function Login() {
                                     <div className="login-right-bg" data-background="assets/img/bg/error_bg.jpg" />
                                     <div className="login-right-content-inner">
                                         <img src="assets/img/images/login_img.png" alt="" />
-                                        <h4 className="title">Revolutionize your writing: Try <span>AI writer today</span> and watch your content soar</h4>
+                                        <h4 className="title">Elevate Your Security: Leverage <span> RAID AI</span> and Detect Deepfakes with Ease.</h4>
                                     </div>
                                 </div>
                             </div>

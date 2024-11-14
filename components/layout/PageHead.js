@@ -5,7 +5,7 @@ const PageHead = ({ headTitle }) => {
         <>
             <Head>
                 <title>
-                    {headTitle ? headTitle : "Dex.AI - AI Writer & Tech Startup Landing Page Nextjs Template"}
+                    {headTitle ? headTitle : "Raid AI - Deepfake Detection Real Time Protection"}
                 </title>
             </Head>
         </>

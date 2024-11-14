@@ -1,5 +1,3 @@
-
-
 export default function Video() {
     return (
         <>
@@ -22,16 +20,22 @@ export default function Video() {
                     <div className="row">
                         <div className="col-lg-12">
                             <div className="video-wrap">
-                                <video className="live-video" loop autoPlay muted>
+                                <video 
+                                    className="live-video" 
+                                    loop 
+                                    autoPlay 
+                                    controls 
+                                    style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
+                                >
                                     <source src="/assets/videos/video_01.mp4" type="video/mp4" />
                                     <source src="/assets/videos/video_01.ogg" type="video/ogg" />
+                                    Your browser does not support the video tag.
                                 </video>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </>
-    )
+    );
 }

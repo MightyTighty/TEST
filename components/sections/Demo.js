@@ -1,6 +1,4 @@
-import Link from "next/link";
-import Layout from "@/components/layout/Layout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Waveform from "@/components/elements/Waveform";
 
 const audioFiles = [
@@ -38,108 +36,62 @@ const audioFiles = [
 
 export default function Demo() {
   const [activeIndex, setActiveIndex] = useState(1);
-  const [currentPlaying, setCurrentPlaying] = useState(null);
-  const [waveSurfers, setWaveSurfers] = useState({}); // Store WaveSurfer instances
+  const waveformRefs = useRef({}); // Store references for each Waveform instance
 
   useEffect(() => {
-    // Cleanup all WaveSurfer instances on component unmount
     return () => {
-      Object.values(waveSurfers).forEach((waveSurfer) => waveSurfer && waveSurfer.destroy());
+      // Stop all audio on component unmount
+      Object.values(waveformRefs.current).forEach((waveSurfer) => waveSurfer?.pause());
     };
-  }, [waveSurfers]);
+  }, []);
 
   const handleOnClick = (index) => {
-    // Stop any playing audio and clear currentPlaying
-    if (currentPlaying) {
-      stopCurrentAudio();
-    }
+    // Pause currently playing audio when switching tabs
+    Object.values(waveformRefs.current).forEach((waveSurfer) => waveSurfer?.pause());
     setActiveIndex(index);
   };
 
-  const handlePlay = (id) => {
-    // Stop any playing audio before starting a new one
-    if (currentPlaying && currentPlaying !== id) {
-      stopCurrentAudio();
-    }
-    setCurrentPlaying(id);
-  };
-
-  const stopCurrentAudio = () => {
-    if (currentPlaying && waveSurfers[currentPlaying]) {
-      waveSurfers[currentPlaying].stop(); // Stop the audio playback completely
-    }
-    setCurrentPlaying(null); // Reset the currentPlaying state
-  };
-
   const registerWaveSurfer = (id, waveSurferInstance) => {
-    setWaveSurfers((prev) => ({
-      ...prev,
-      [id]: waveSurferInstance,
-    }));
+    waveformRefs.current[id] = waveSurferInstance;
   };
 
   return (
-    <>
-      <section className="job-area pb-150">
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-12">
-              <div className="job-tab-wrap">
-                <ul className="nav nav-tabs" id="myTab" role="tablist">
-                  <li className="nav-item" onClick={() => handleOnClick(1)}>
-                    <button
-                      className={activeIndex == 1 ? "nav-link active" : "nav-link"}
-                      aria-selected="false"
-                    >
-                      DeepFake Detection
-                    </button>
-                  </li>
-
-                  <li className="nav-item" onClick={() => handleOnClick(2)}>
-                    <button
-                      className={activeIndex == 2 ? "nav-link active" : "nav-link"}
-                    >
-                      Text to Speech
-                    </button>
-                  </li>
-                  <li className="nav-item" onClick={() => handleOnClick(3)}>
-                    <button
-                      className={activeIndex == 3 ? "nav-link active" : "nav-link"}
-                      aria-selected="false"
-                    >
-                      Speech to Speech
-                    </button>
-                  </li>
-                </ul>
-                <div className="tab-content" id="myTabContent">
-                  <div
-                    className={
-                      activeIndex == 1
-                        ? "tab-pane fade show active texttospeach"
-                        : "tab-pane fade texttospeach"
-                    }
+    <section className="job-area pb-150">
+      <div className="container">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="job-tab-wrap">
+              <ul className="nav nav-tabs" id="myTab" role="tablist">
+                <li className="nav-item" onClick={() => handleOnClick(1)}>
+                  <button
+                    className={activeIndex === 1 ? "nav-link active" : "nav-link"}
+                    aria-selected="false"
                   >
-                    <div className="contact-form audiolist">
-                      <div className="job-item-wrap">
-                        <Waveform
-                          key={audioFiles[0].id}
-                          audioUrl={audioFiles[0].url}
-                          waveColor={audioFiles[0].waveColor}
-                          progressColor={audioFiles[0].progressColor}
-                          size={audioFiles[0].size}
-                          filename={audioFiles[0].filename}
-                          IsReal={audioFiles[0].isReal}
-                          forHome={audioFiles[0].forHome}
-                          audioId={audioFiles[0].id}
-                          onPlay={() => handlePlay(audioFiles[0].id)} // Attach the play handler
-                          registerWaveSurfer={registerWaveSurfer} // Register the WaveSurfer instance
-                        />
-                      </div>
-                    </div>
-                  </div>
+                    DeepFake Detection
+                  </button>
+                </li>
+                <li className="nav-item" onClick={() => handleOnClick(2)}>
+                  <button
+                    className={activeIndex === 2 ? "nav-link active" : "nav-link"}
+                  >
+                    Text to Speech
+                  </button>
+                </li>
+                <li className="nav-item" onClick={() => handleOnClick(3)}>
+                  <button
+                    className={activeIndex === 3 ? "nav-link active" : "nav-link"}
+                    aria-selected="false"
+                  >
+                    Speech to Speech
+                  </button>
+                </li>
+              </ul>
+              <div className="tab-content" id="myTabContent">
+                {audioFiles.map((file, index) => (
                   <div
+                    key={file.id}
                     className={
-                      activeIndex == 2
+                      activeIndex === file.id
                         ? "tab-pane fade show active"
                         : "tab-pane fade"
                     }
@@ -147,53 +99,25 @@ export default function Demo() {
                     <div className="contact-form audiolist">
                       <div className="job-item-wrap">
                         <Waveform
-                          key={audioFiles[1].id}
-                          audioUrl={audioFiles[1].url}
-                          waveColor={audioFiles[1].waveColor}
-                          progressColor={audioFiles[1].progressColor}
-                          size={audioFiles[1].size}
-                          filename={audioFiles[1].filename}
-                          IsReal={audioFiles[1].isReal}
-                          forHome={audioFiles[1].forHome}
-                          audioId={audioFiles[1].id}
-                          onPlay={() => handlePlay(audioFiles[1].id)} // Attach the play handler
-                          registerWaveSurfer={registerWaveSurfer} // Register the WaveSurfer instance
+                          audioUrl={file.url}
+                          waveColor={file.waveColor}
+                          progressColor={file.progressColor}
+                          size={file.size}
+                          filename={file.filename}
+                          IsReal={file.isReal}
+                          forHome={file.forHome}
+                          audioId={file.id}
+                          registerWaveSurfer={registerWaveSurfer}
                         />
                       </div>
                     </div>
                   </div>
-
-                  <div
-                    className={
-                      activeIndex == 3
-                        ? "tab-pane fade show active"
-                        : "tab-pane fade"
-                    }
-                  >
-                    <div className="contact-form audiolist">
-                      <div className="job-item-wrap">
-                        <Waveform
-                          key={audioFiles[2].id}
-                          audioUrl={audioFiles[2].url}
-                          waveColor={audioFiles[2].waveColor}
-                          progressColor={audioFiles[2].progressColor}
-                          size={audioFiles[2].size}
-                          filename={audioFiles[2].filename}
-                          IsReal={audioFiles[2].isReal}
-                          forHome={audioFiles[2].forHome}
-                          audioId={audioFiles[2].id}
-                          onPlay={() => handlePlay(audioFiles[2].id)} // Attach the play handler
-                          registerWaveSurfer={registerWaveSurfer} // Register the WaveSurfer instance
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 }

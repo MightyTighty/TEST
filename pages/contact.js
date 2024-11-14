@@ -67,7 +67,7 @@ export default function Contact() {
                                             </div>
                                             <div className="content">
                                                 <h2 className="title">Visit Us Daily</h2>
-                                               <p><a href="https://www.linkedin.com/feed/" > linkedin</a></p>
+                                               <p><a href="https://www.linkedin.com/company/raid-ai" > Linkedin</a></p>
                                             </div>
                                         </div>
                                     </div>
@@ -78,8 +78,9 @@ export default function Contact() {
                                             </div>
                                             <div className="content">
                                                 <h2 className="title">Contact Us</h2>
-                                                <span>+ 1 008-345-6789</span>
-                                                <span>+1 800-789-4561</span>
+                                                
+                                               <p><a href="https://www.linkedin.com/company/raid-ai" > Linkedin</a></p>
+                                                
                                             </div>
                                         </div>
                                     </div>
@@ -90,8 +91,8 @@ export default function Contact() {
                                             </div>
                                             <div className="content">
                                                 <h2 className="title">Email Us</h2>
-                                                <span>Sotcoxinfo@example.com</span>
-                                                <span>Webyourinfo@gmail.com</span>
+                                                <span>info@raidai.net</span>
+                                                
                                             </div>
                                         </div>
                                     </div>
