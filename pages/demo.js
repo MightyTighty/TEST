@@ -5,59 +5,43 @@ import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import Switch from "react-switch";
 import { useRouter } from 'next/router';
-
 export default function Job() {
     const router = useRouter();
-    const [activeIndex, setActiveIndex] = useState(1);
-    const [isImageVisible, setImageVisible] = useState(true);
-    const [files, setFiles] = useState([]); // Keep all files in an array
-    const [isChecked, setIsChecked] = useState(true);
-    const [currentPlaying, setCurrentPlaying] = useState(null);
-
-    const [token, setToken] = useState("");
+    const [files, setFiles] = useState([]);
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState("Drag & Drop or Click to Upload Audio");
     const [averageResult, setAverageResult] = useState({ result: '', confidence: 0 });
+    const [isChecked, setIsChecked] = useState(true);
 
     useEffect(() => {
-        const tok = localStorage.getItem("token");
-        if (tok) {
-            setToken(tok);
-        }
-    }, []);
-
-    const handleFileChange = (event) => {
-        const tok = localStorage.getItem("token");
-        if (!tok) {
+        const token = localStorage.getItem("token");
+        if (!token) {
             router.push("/login");
         }
+    }, [router]);
 
+    const handleFileChange = (event) => {
         const selectedFile = event.target.files[0];
         if (selectedFile) {
             setFile(selectedFile);
-            const objectUrl = URL.createObjectURL(selectedFile);
             setPreview("File Ready to Upload");
 
-            // Add the new file to the list of files
             const newFile = {
-                id: files.length, // Use length as ID for new files
-                url: objectUrl,
+                id: files.length,
+                url: URL.createObjectURL(selectedFile),
                 waveColor: '#FFFFFF',
                 progressColor: '#FF9900',
                 size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
                 filename: selectedFile.name,
-                isReal: null // Set as null for now since we don't have the result
+                isReal: null,
             };
-            setFiles([...files, newFile]); // Append new file to previous files
+            setFiles([...files, newFile]);
         }
     };
-    
-      // Handle drag and drop events
+
     const handleDragOver = (event) => {
-        event.preventDefault(); // Allow drop
+        event.preventDefault();
     };
-
-
 
     const handleDrop = (event) => {
         event.preventDefault();
@@ -66,90 +50,89 @@ export default function Job() {
             setFile(selectedFile);
             setPreview("File Ready to Upload");
 
-            // Add the new file to the list of files
             const newFile = {
-                id: files.length, // Use length as ID for new files
+                id: files.length,
                 url: URL.createObjectURL(selectedFile),
                 waveColor: '#FFFFFF',
                 progressColor: '#FF9900',
                 size: { height: 50, barHeight: 20, barRadius: 2, barWidth: 3 },
                 filename: selectedFile.name,
-                isReal: null // Set as null for now since we don't have the result
+                isReal: null,
             };
-            setFiles([...files, newFile]); // Append new file to previous files
+            setFiles([...files, newFile]);
         }
     };
 
-    
-
-    // Function to upload chunks of the audio file
     const uploadChunk = async (chunk, index) => {
         const formData = new FormData();
         const audioFile = new File([chunk], `chunk-${index}.wav`, { type: 'audio/wav' });
         formData.append('file', audioFile);
 
-        let token = localStorage.getItem("token");
+        try {
+            const response = await fetch('http://98.67.165.93:5000/predict', {
+                method: 'POST',
+                body: formData,
+            });
 
-        const response = await fetch('http://98.67.165.93:5000/predict', {
-            method: 'POST',
-           
-            body: formData
-        });
+            if (!response.ok) {
+                throw new Error(`Server Error: ${response.status}`);
+            }
 
-        return response.json();
+            return await response.json();
+        } catch (error) {
+            console.error(`Error uploading chunk ${index}:`, error);
+            return null;
+        }
     };
 
-    // Function to handle file upload and chunking
     const handleUpload = async () => {
         if (!file) return;
-    
+
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const arrayBuffer = await file.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    
-        const chunkDuration = 2; // 2 seconds
-        const chunkSize = chunkDuration * audioBuffer.sampleRate; // Number of samples in 2 seconds
+
+        const chunkDuration = 2; // 2 seconds per chunk
+        const chunkSize = chunkDuration * audioBuffer.sampleRate;
         const totalChunks = Math.ceil(audioBuffer.length / chunkSize);
-    
+
         let totalConfidence = 0;
         let totalResults = 0;
         let isRealCount = 0;
-    
+
         for (let i = 0; i < totalChunks; i++) {
             const start = i * chunkSize;
             const end = Math.min((i + 1) * chunkSize, audioBuffer.length);
             const chunk = audioBuffer.getChannelData(0).slice(start, end);
-    
+
             const wavBuffer = encodeWAV(chunk, audioBuffer.sampleRate, 1);
             const chunkBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-    
+
             const result = await uploadChunk(chunkBlob, i);
             if (result) {
                 totalConfidence += result.confidence;
                 totalResults++;
-    
+
                 if (result.result === 'real') isRealCount++;
             }
         }
-    
-        // Reset preview and file after upload
-        setPreview("Drag & Drop or Click to Upload Audio");
-        setFile(null); // Reset file state
-    
-        // Calculate average result
+
         const averageConfidence = totalConfidence / totalResults;
         const majorityResult = isRealCount > totalResults / 2 ? 'real' : 'fake';
-    
+
         setAverageResult({ result: majorityResult, confidence: averageConfidence });
-    
-        // Update the original file result in files state with average result
-        const updatedFiles = files.map(file =>
-            file.id === files.length - 1 ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' } : file
+
+        const updatedFiles = files.map((file, idx) =>
+            idx === files.length - 1
+                ? { ...file, isReal: majorityResult === 'real', progressColor: averageConfidence > 0.5 ? 'green' : 'red' }
+                : file
         );
-        
         setFiles(updatedFiles);
+
+        setPreview("Drag & Drop or Click to Upload Audio");
+        setFile(null);
     };
-    
+
     const encodeWAV = (samples, sampleRate, numChannels) => {
         const buffer = new ArrayBuffer(44 + samples.length * 2);
         const view = new DataView(buffer);
@@ -160,34 +143,20 @@ export default function Job() {
             }
         };
 
-        /* RIFF identifier */
         writeString(view, 0, 'RIFF');
-        /* file length */
         view.setUint32(4, 36 + samples.length * 2, true);
-        /* RIFF type */
         writeString(view, 8, 'WAVE');
-        /* format chunk identifier */
         writeString(view, 12, 'fmt ');
-        /* format chunk length */
         view.setUint32(16, 16, true);
-        /* sample format (raw) */
         view.setUint16(20, 1, true);
-        /* channel count */
         view.setUint16(22, numChannels, true);
-        /* sample rate */
         view.setUint32(24, sampleRate, true);
-        /* byte rate (sample rate * block align) */
         view.setUint32(28, sampleRate * numChannels * 2, true);
-        /* block align (channel count * bytes per sample) */
         view.setUint16(32, numChannels * 2, true);
-        /* bits per sample */
         view.setUint16(34, 16, true);
-        /* data chunk identifier */
         writeString(view, 36, 'data');
-        /* data chunk length */
         view.setUint32(40, samples.length * 2, true);
 
-        /* Write samples to data chunk */
         let offset = 44;
         for (let i = 0; i < samples.length; i++, offset += 2) {
             const s = Math.max(-1, Math.min(1, samples[i]));
@@ -196,7 +165,6 @@ export default function Job() {
 
         return buffer;
     };
-
     const handleOnClick = (index) => {
         setActiveIndex(index);
     };
