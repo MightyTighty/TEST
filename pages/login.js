@@ -21,43 +21,34 @@ export default function Login() {
       }, []);
 
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      setLoading(true);
-      setError('');
-  
-      try {
-        const response = await fetch('http://localhost:8000/apilogin/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        });
-  
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+      
+        // Default test login credentials
+        const testUser = {
+          email: 'testuser@example.com',
+          password: 'testpassword',
+          token: 'testtoken123',
+        };
+      
+        try {
+          if (email === testUser.email && password === testUser.password) {
+            // Simulate successful login
+            localStorage.setItem("token", testUser.token);
+            router.push("/demo");
+          } else {
+            // If not test credentials, simulate failed login
+            setError('Invalid test credentials');
+          }
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
         }
-       
-        const data = await response.json();
-  
-        console.log(data);
-        if(data.access!=""){
-          localStorage.setItem("token",data.access);
-          router.push("/demo");
-        } else {
-          // Handle login failure
-          setError(data.message || 'Login failed');
-        }
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
+      
 
 
     return (
