@@ -92,9 +92,7 @@ export default function Job() {
 
         const response = await fetch('http://98.67.165.93:5000/predict', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            },
+           
             body: formData
         });
 
