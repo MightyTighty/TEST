@@ -90,7 +90,7 @@ export default function Job() {
 
         let token = localStorage.getItem("token");
 
-        const response = await fetch('http://127.0.0.1:8000/api/audio-upload/', {
+        const response = await fetch('http://98.67.165.93:5000/predict', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`
