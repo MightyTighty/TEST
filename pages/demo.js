@@ -64,26 +64,32 @@ export default function Job() {
     };
 
     const uploadChunk = async (chunk, index) => {
+        // Create a FormData object
         const formData = new FormData();
         const audioFile = new File([chunk], `chunk-${index}.wav`, { type: 'audio/wav' });
-        formData.append('file', audioFile);
-
+        formData.append("file", audioFile, `chunk-${index}.wav`);
+    
+        const requestOptions = {
+            method: "POST",
+            body: formData, // Send FormData exactly like Postman
+            redirect: "follow"
+        };
+    
         try {
-            const response = await fetch('http://98.67.165.93:5000/predict', {
-                method: 'POST',
-                body: formData,
-            });
-
+            const response = await fetch("http://98.67.165.93:5000/predict", requestOptions);
+    
             if (!response.ok) {
                 throw new Error(`Server Error: ${response.status}`);
             }
-
-            return await response.json();
+    
+            const result = await response.json(); // Assuming the server returns JSON
+            return result;
         } catch (error) {
             console.error(`Error uploading chunk ${index}:`, error);
-            return null;
+            return null; // Return null in case of error
         }
     };
+    
 
     const handleUpload = async () => {
         if (!file) return;
