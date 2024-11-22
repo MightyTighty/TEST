@@ -76,7 +76,7 @@ export default function Job() {
         };
     
         try {
-            const response = await fetch("http://98.67.165.93:5000/predict", requestOptions);
+            const response = await fetch("https://api.raidai.net/backend", requestOptions);
     
             if (!response.ok) {
                 throw new Error(`Server Error: ${response.status}`);
