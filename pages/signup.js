@@ -41,7 +41,7 @@ export default function Login() {
     
         try {
          
-          const response = await fetch('http://localhost:8000/apiregister/', {
+          const response = await fetch('https://api.raidai.net/backend/apiregister/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
