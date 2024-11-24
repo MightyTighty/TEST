@@ -3,54 +3,48 @@ import { useState, useRef, useEffect } from 'react'
 
 import { useRouter } from 'next/navigation';
 
-export default function Contact() {
-    const router = useRouter();
+export default function ContactForm() {
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [message, setMessage] = useState('');
-    
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
-
     const handleSubmit = async (event) => {
         event.preventDefault();
-    
         setLoading(true);
         setError(null);
         setSuccess(null);
-    
-        const postData = { fullName, email,phone,message };
-    
+
+        const postData = { fullName, email, phone, message };
+
         try {
-         
-          const response = await fetch('https://api.raidai.net/backend/apicontactus/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-              },
-            body: JSON.stringify(postData),
-          });
-    
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-    
-          const result = await response.json();
-          setFullName('');
-          setEmail('');
-          setPhone('');
-          setMessage('');
-          setSuccess('Thanks! Submitted successfully! we will contact you soon.');
-         
+            const response = await fetch('https://api.raidai.net/backend/apicontactus/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to submit the form. Please try again.');
+            }
+
+            const result = await response.json();
+            setFullName('');
+            setEmail('');
+            setPhone('');
+            setMessage('');
+            setSuccess('Your message has been sent successfully!');
         } catch (error) {
-          setError(error.message);
+            setError(error.message);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
+    };
 
     return (
         <>
