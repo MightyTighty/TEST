@@ -129,9 +129,9 @@ export default function Login() {
                                             />
                                         </div>
                                       
-                                        <button type="submit" className="sine-btn">sing up</button>
+                                        <button type="submit" className="sine-btn">sign up</button>
                                    
-                                        <span>have an account? <a href="/login"></a>login</span>
+                                        <span>have an account? <a href="/login">login</a></span>
                                     </form>
                                 </div>
                             </div>
@@ -140,7 +140,7 @@ export default function Login() {
                                     <div className="login-right-bg" data-background="assets/img/bg/error_bg.jpg" />
                                     <div className="login-right-content-inner">
                                         <img src="assets/img/images/login_img.png" alt="" />
-                                        <h4 className="title">Revolutionize your writing: Try <span>AI writer today</span> and watch your content soar</h4>
+                                        <h4 className="title">Elevate Your Security: Leverage <span>RAID AI</span> and Detect Deepfakes with Ease.</h4>
                                     </div>
                                 </div>
                             </div>

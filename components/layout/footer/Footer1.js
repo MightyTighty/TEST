@@ -76,8 +76,8 @@ export default function Footer1() {
                                             <ul className="list-wrap">
                                                 <li><Link href="/">Raid AI</Link></li>
                                                 <li><Link href="/work">Our work</Link></li>
-                                                <li><Link href="/about">About us</Link></li>
-                                                <li><Link href="/help">Support</Link></li>
+                                                <li><Link href="/contact">About us</Link></li>
+                                                <li><Link href="/contact">Support</Link></li>
                                                 <li><Link href="/contact">Contact us</Link></li>
                                             </ul>
                                         </div>

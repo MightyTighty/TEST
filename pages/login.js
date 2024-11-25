@@ -94,7 +94,7 @@ export default function Login() {
                                         </div>
                                         <button type="submit" className="sine-btn">Sign In</button>
                                    
-                                        <span>Don’t have an account? <a href="/signup">Sign up for free</a></span>
+                                        <span>Don’t have an account? <a href="/signup">Sign up now!</a></span>
                                     </form>
                                 </div>
                             </div>
