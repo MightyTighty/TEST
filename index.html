@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RaidAI — Coming Soon</title>
+  <!-- Bootstrap CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+    rel="stylesheet"
+  >
+  <style>
+    :root {
+      --brand-primary:   #5A66FF;  /* blue */
+      --brand-secondary: #00D68F;  /* green */
+      --brand-accent:    #FF9A3C;  /* orange */
+      --brand-light:     #F2F0FF;  /* very light purple */
+      --text-dark:       #1F1F1F;
+      --text-light:      #555555;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--brand-light);
+      color: var(--text-dark);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .coming-soon-container {
+      text-align: center;
+      background: #fff;
+      padding: 3rem;
+      border-radius: .5rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      max-width: 400px;
+      width: 90%;
+    }
+
+    .coming-soon-logo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: var(--brand-primary);
+      margin-bottom: 1rem;
+    }
+
+    .coming-soon-logo span {
+      color: var(--text-dark);
+      font-weight: normal;
+    }
+
+    .coming-soon h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .coming-soon p {
+      color: var(--text-light);
+      margin-bottom: 2rem;
+    }
+
+    .subscribe-form .form-control {
+      border-radius: .25rem 0 0 .25rem;
+      border-color: var(--brand-light);
+    }
+
+    .subscribe-form .btn {
+      border-radius: 0 .25rem .25rem 0;
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
+    }
+    .subscribe-form .btn:hover {
+      background: var(--brand-secondary);
+      border-color: var(--brand-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="coming-soon-container">
+    <div class="coming-soon-logo">
+      Raid<span>AI</span>
+    </div>
+    <div class="coming-soon">
+      <h1>Coming Soon</h1>
+      <p>We’re working hard to bring you our new AI-powered platform.</p>
+
+      <!-- Email subscription -->
+      <form class="subscribe-form d-flex">
+        <input 
+          type="email" 
+          class="form-control" 
+          placeholder="Your email address"
+          aria-label="Email address"
+        >
+        <button type="submit" class="btn btn-primary">
+          Notify Me
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Optional: Bootstrap JS Bundle -->
+  <script 
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+  </script>
+</body>
+</html>
